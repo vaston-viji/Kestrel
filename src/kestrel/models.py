@@ -45,16 +45,16 @@ class RawItem:
 
 @dataclass
 class Classification:
-    kpmg_tags: list[str]
+    kestrel_tags: list[str]
     domain_tags: list[str]
     impact_score: float          # 1–5
-    kpmg_sentiment: float        # -2..+2
+    kestrel_sentiment: float     # -2..+2
     primary_section: str         # 'policy' | 'market' | 'tech'
 
 
 @dataclass
 class Taxonomy:
-    kpmg_tags: list[str]
+    kestrel_tags: list[str]
     domain_tags: list[str]
 
 
@@ -62,7 +62,7 @@ class Taxonomy:
 class ItemNarrative:
     what_happened: str
     why_it_matters: str
-    kpmg_angle: str
+    kestrel_angle: str
 
 
 @dataclass

@@ -116,17 +116,17 @@ class AnthropicSynthesizer:
 
     def classify(self, item: RawItem, taxonomy: Taxonomy) -> Classification:
         template = _load_prompt("classify", self._root)
-        prompt = template.replace("{{KPMG_TAGS}}", str(taxonomy.kpmg_tags)) \
+        prompt = template.replace("{{KESTREL_TAGS}}", str(taxonomy.kestrel_tags)) \
                          .replace("{{DOMAIN_TAGS}}", str(taxonomy.domain_tags)) \
                          .replace("{{ITEM}}", _item_context(item))
         try:
             raw = self._call(prompt, max_tokens=256)
             data = _extract_json(raw)
             return Classification(
-                kpmg_tags=[t for t in data.get("kpmg_tags", []) if t in taxonomy.kpmg_tags],
+                kestrel_tags=[t for t in data.get("kestrel_tags", []) if t in taxonomy.kestrel_tags],
                 domain_tags=[t for t in data.get("domain_tags", []) if t in taxonomy.domain_tags],
                 impact_score=float(data.get("impact_score", 2)),
-                kpmg_sentiment=float(data.get("kpmg_sentiment", 0)),
+                kestrel_sentiment=float(data.get("kestrel_sentiment", 0)),
                 primary_section=data.get("primary_section", "policy"),
             )
         except Exception as exc:
@@ -159,7 +159,7 @@ class AnthropicSynthesizer:
             return ItemNarrative(
                 what_happened=str(data.get("what_happened", item.snippet or item.title)),
                 why_it_matters=str(data.get("why_it_matters", "")),
-                kpmg_angle=str(data.get("kpmg_angle", "")),
+                kestrel_angle=str(data.get("kestrel_angle", "")),
             )
         except Exception as exc:
             log.warning("enrich_item fallback for '%s': %s", item.title[:60], exc)

@@ -72,7 +72,7 @@ class EscalationRule:
 
 @dataclass
 class AudienceConfig:
-    audience: str = "KPMG Partners"
+    audience: str = "Defence & Industry"
     top_line_max_words: int = 150
     feedback_email: str = "vjohn1@kpmg.com.au"
 
@@ -158,7 +158,7 @@ def load_config(project_root: Path) -> AppConfig:
     audience = _parse_audience(raw_config["audience"])
 
     taxonomy = Taxonomy(
-        kpmg_tags=[t["tag"] for t in raw_config["kpmg_tags"]],
+        kestrel_tags=[t["tag"] for t in raw_config["kestrel_tags"]],
         domain_tags=[t["tag"] for t in raw_config["domain_tags"]],
     )
 

@@ -128,7 +128,7 @@ def read_kestrel_config(path: Path) -> dict:
     # Categories_KPMG
     ws = _sheet(wb, "Categories_KPMG", path)
     rows = _rows_as_dicts(ws, ["Tag", "Description", "Active"], path, "Categories_KPMG")
-    result["kpmg_tags"] = [
+    result["kestrel_tags"] = [
         {"tag": _str(r["tag"]), "description": _str(r["description"])}
         for r in rows if _bool_yes(r.get("active"))
     ]
