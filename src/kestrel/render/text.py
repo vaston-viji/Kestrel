@@ -64,9 +64,9 @@ def render_text(brief: Brief) -> str:
     # Footnote
     parts.append(f"\n{_SEP}")
     parts.append("This email was created by AI. Errors & Omissions Expected.")
-    parts.append("For feedback to this email please email Viji John <vjohn1@kpmg.com.au>")
+    parts.append("For feedback to this email please email Viji John <viji.john@quantrim.com>")
     parts.append(
-        "Unsubscribe: mailto:vjohn1@kpmg.com.au"
+        "Unsubscribe: mailto:viji.john@quantrim.com"
         "?subject=Kestrel%20Unsubscribe"
         "&body=Please%20remove%20me%20from%20the%20Kestrel%20distribution%20list."
     )

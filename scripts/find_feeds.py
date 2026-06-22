@@ -22,7 +22,7 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)-8s %(message)s",
                     stream=sys.stdout)
 log = logging.getLogger("find_feeds")
 
-UA = "Kestrel/1.0 (RSS discovery; contact vjohn1@kpmg.com.au)"
+UA = "Kestrel/1.0 (RSS discovery; contact viji.john@quantrim.com)"
 HEADERS = {"User-Agent": UA, "Accept": "application/rss+xml, application/atom+xml, text/html"}
 
 # Paths to probe (in order — first hit wins)
