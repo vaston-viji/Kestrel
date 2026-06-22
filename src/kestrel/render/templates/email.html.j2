@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>{{ brief.subject }}</title>
+</head>
+<body style="margin:0;padding:0;background:{{ c.outer_bg }};font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;">
+
+<!-- Preheader text (hidden in inbox preview) -->
+<div style="display:none;max-height:0;overflow:hidden;color:{{ c.outer_bg }};">
+{{ brief.slot|title }} Defence brief — {{ run_date_display }}
+</div>
+
+<!-- Outer wrapper -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:{{ c.outer_bg }};">
+<tr><td align="center" style="padding:20px 10px;">
+
+<!-- Main container -->
+<table width="840" cellpadding="0" cellspacing="0" border="0" style="max-width:840px;width:100%;background:{{ c.container }};border-radius:4px;overflow:hidden;">
+
+  <!-- ============================================================
+       MASTHEAD
+  ============================================================ -->
+  <tr>
+    <td style="padding:0;">
+      {% if header_b64 %}
+      <img src="data:image/png;base64,{{ header_b64 }}"
+           alt="Kestrel D&DI Market Scan"
+           width="840" style="display:block;width:100%;max-width:840px;height:auto;border:0;" />
+      {% else %}
+      <!-- Fallback masthead if image is unavailable -->
+      <table width="100%" cellpadding="0" cellspacing="0" border="0"
+             style="background:{{ c.hdr_bg }};">
+        <tr>
+          <td style="padding:32px 40px;">
+            <div style="font-size:28px;font-weight:700;color:#ffffff;letter-spacing:2px;">KESTREL</div>
+            <div style="font-size:11px;color:{{ c.hdr_sub }};margin-top:4px;letter-spacing:2px;text-transform:uppercase;">Defence Insights</div>
+          </td>
+        </tr>
+      </table>
+      {% endif %}
+    </td>
+  </tr>
+
+  <!-- LATE RUN banner -->
+  {% if brief.is_late %}
+  <tr>
+    <td style="background:{{ c.late_bg }};padding:8px 40px;text-align:center;">
+      <span style="color:#ffffff;font-size:12px;font-weight:700;letter-spacing:1px;">
+        LATE RUN — generated {{ brief.generated_at.strftime('%H:%M') }}
+      </span>
+    </td>
+  </tr>
+  {% endif %}
+
+  <!-- Descriptor line -->
+  <tr>
+    <td style="padding:20px 40px 0 40px;border-bottom:2px solid {{ c.border }};">
+      <p style="margin:0 0 16px 0;font-size:13px;color:{{ c.body }};font-style:italic;text-align:center;">
+        The developments that matter for Australian Defence, sovereign industry and national resilience.
+      </p>
+    </td>
+  </tr>
+
+  <!-- Slot / date bar -->
+  <tr>
+    <td style="padding:12px 40px;background:{{ c.stripe }};border-bottom:1px solid {{ c.border }};">
+      <p style="margin:0;font-size:12px;color:{{ c.body }};">
+        <strong>{{ brief.slot|title }} Brief</strong> &nbsp;·&nbsp; {{ run_date_display }}
+      </p>
+    </td>
+  </tr>
+
+  <!-- ============================================================
+       TOP LINE
+  ============================================================ -->
+  <tr>
+    <td style="padding:28px 40px 8px 40px;">
+      <h2 style="margin:0 0 16px 0;font-size:16px;font-weight:700;color:{{ c.violet }};
+                 text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid {{ c.violet }};
+                 padding-bottom:8px;">Top Line</h2>
+      {% if brief.top_line %}
+      <ul style="margin:0;padding:0 0 0 18px;">
+        {% for bullet in brief.top_line %}
+        <li style="margin:0 0 10px 0;font-size:14px;color:{{ c.body }};line-height:1.6;">
+          {{ bullet|replace("- ", "", 1)|replace("**", "")|replace("<b>", "<strong>")|replace("</b>", "</strong>")|safe }}
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p style="margin:0;font-size:14px;color:{{ c.body }};font-style:italic;">
+        [[PASTE FROM CLAUDE — Top Line bullets (3–5, ≤150 words, bold key entities)]]
+      </p>
+      {% endif %}
+    </td>
+  </tr>
+
+  <!-- ============================================================
+       QUOTE OF THE DAY
+  ============================================================ -->
+  {% if brief.quote and brief.quote[0] %}
+  <tr>
+    <td style="padding:20px 60px;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0"
+             style="background:{{ c.quote_bg }};border-left:4px solid {{ c.violet }};">
+        <tr>
+          <td style="padding:16px 20px;">
+            <p style="margin:0 0 8px 0;font-size:14px;color:{{ c.body }};font-style:italic;text-align:center;">
+              "{{ brief.quote[0] }}"
+            </p>
+            <p style="margin:0;font-size:12px;color:{{ c.violet }};text-align:center;font-weight:600;">
+              — {{ brief.quote[1] }}
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  {% endif %}
+
+  <!-- ============================================================
+       PRIORITY DEVELOPMENTS
+  ============================================================ -->
+  {% if brief.priority_items %}
+  <tr>
+    <td style="padding:20px 40px 8px 40px;border-top:1px solid {{ c.border }};">
+      <h2 style="margin:0 0 20px 0;font-size:16px;font-weight:700;color:{{ c.blue }};
+                 text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid {{ c.blue }};
+                 padding-bottom:8px;">Priority Developments</h2>
+      {% for bi in brief.priority_items %}
+      <table width="100%" cellpadding="0" cellspacing="0" border="0"
+             style="margin-bottom:20px;border-bottom:1px solid {{ c.border }};padding-bottom:20px;">
+        <tr>
+          <td>
+            <!-- Headline -->
+            <p style="margin:0 0 6px 0;font-size:15px;font-weight:700;color:{{ c.body }};">
+              <a href="{{ bi.scored.canonical_url }}" style="color:{{ c.blue }};text-decoration:none;">
+                {{ bi.scored.title }}
+              </a>
+            </p>
+            <!-- Domain tags + confidence badges -->
+            <p style="margin:0 0 10px 0;">
+              {% for tag in bi.scored.classification.domain_tags %}
+              <span style="display:inline-block;background:{{ c.tag_bg }};color:{{ c.tag_text }};font-size:10px;
+                           font-weight:700;padding:2px 6px;border-radius:2px;margin-right:4px;letter-spacing:0.5px;">
+                {{ tag }}
+              </span>
+              {% endfor %}
+              {% if bi.scored.confidence == "low" %}
+              <span style="display:inline-block;background:{{ c.border }};color:{{ c.body }};font-size:10px;
+                           font-weight:700;padding:2px 6px;border-radius:2px;">
+                LOW CONFIDENCE
+              </span>
+              {% elif bi.scored.confidence == "medium" %}
+              <span style="display:inline-block;background:{{ c.border }};color:{{ c.body }};font-size:10px;
+                           font-weight:600;padding:2px 6px;border-radius:2px;">
+                MEDIUM CONFIDENCE
+              </span>
+              {% endif %}
+            </p>
+            <!-- What happened -->
+            <p style="margin:0 0 8px 0;font-size:14px;color:{{ c.body }};line-height:1.6;">
+              <strong>What happened:</strong> {{ bi.narrative.what_happened }}
+            </p>
+            <!-- Why it matters -->
+            <p style="margin:0 0 8px 0;font-size:14px;color:{{ c.body }};line-height:1.6;">
+              <strong>Why it matters:</strong> {{ bi.narrative.why_it_matters }}
+            </p>
+            <!-- Kestrel Angle -->
+            <p style="margin:0 0 8px 0;font-size:12px;color:{{ c.body }};line-height:1.6;
+                      border-left:3px solid {{ c.angle_bdr }};padding-left:12px;background:{{ c.angle_bg }};padding-top:8px;padding-bottom:8px;">
+              <strong style="color:{{ c.violet }};font-size:11px;">Kestrel Angle:</strong> {{ bi.narrative.kpmg_angle }}
+            </p>
+            <!-- Source attribution -->
+            <p style="margin:0;font-size:11px;color:{{ c.muted }};">
+              Source: {{ bi.scored.source_name }}
+              {% if bi.scored.corroborating_sources %}
+              &nbsp;· Also: {% for csrc, curl in bi.scored.corroborating_sources %}
+              <a href="{{ curl }}" style="color:{{ c.blue }};">{{ csrc }}</a>{% if not loop.last %}, {% endif %}
+              {% endfor %}
+              {% endif %}
+            </p>
+          </td>
+        </tr>
+      </table>
+      {% endfor %}
+    </td>
+  </tr>
+  {% endif %}
+
+  <!-- ============================================================
+       MAIN BODY — 3 MECE subsections
+  ============================================================ -->
+  {% set body_sections = [
+    ("Policy, posture and geopolitics", brief.policy_items),
+    ("Market and industry moves",       brief.market_items),
+    ("Emerging technology and dual-use",brief.tech_items),
+  ] %}
+  {% for section_title, section_items in body_sections %}
+  {% if section_items %}
+  <tr>
+    <td style="padding:20px 40px 8px 40px;border-top:1px solid {{ c.border }};">
+      <h3 style="margin:0 0 14px 0;font-size:14px;font-weight:700;color:{{ c.body }};
+                 text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid {{ c.border }};
+                 padding-bottom:6px;">{{ section_title }}</h3>
+      <ul style="margin:0;padding:0 0 0 18px;">
+        {% for bi in section_items %}
+        <li style="margin:0 0 10px 0;font-size:13px;color:{{ c.body }};line-height:1.6;">
+          <strong>{{ bi.scored.title }}</strong>
+          {% if bi.scored.snippet %} — {{ bi.scored.snippet[:300] }}{% if bi.scored.snippet|length > 300 %}…{% endif %}{% endif %}
+          <a href="{{ bi.scored.canonical_url }}" style="color:{{ c.blue }};font-size:11px;">
+            ({{ bi.scored.source_name }})
+          </a>
+          {% if bi.scored.confidence == "low" %}
+          <span style="color:{{ c.muted }};font-size:10px;"> [low confidence]</span>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </td>
+  </tr>
+  {% endif %}
+  {% endfor %}
+
+  <!-- ============================================================
+       WATCHPOINTS
+  ============================================================ -->
+  {% if brief.watchpoints %}
+  <tr>
+    <td style="padding:20px 40px 8px 40px;border-top:2px solid {{ c.violet }};">
+      <h2 style="margin:0 0 16px 0;font-size:16px;font-weight:700;color:{{ c.violet }};
+                 text-transform:uppercase;letter-spacing:1px;padding-bottom:8px;">Watchpoints</h2>
+      <ul style="margin:0;padding:0 0 0 18px;">
+        {% for wp in brief.watchpoints %}
+        <li style="margin:0 0 10px 0;font-size:14px;color:{{ c.body }};line-height:1.6;">
+          {{ wp|replace("- ", "", 1) }}
+        </li>
+        {% endfor %}
+      </ul>
+    </td>
+  </tr>
+  {% endif %}
+
+  <!-- ============================================================
+       FOOTNOTE
+  ============================================================ -->
+  <tr>
+    <td style="padding:24px 40px;border-top:2px solid {{ c.border }};background:{{ c.footer_bg }};text-align:center;">
+      <p style="margin:0 0 6px 0;font-size:11px;color:{{ c.muted }};">
+        This email was created by AI. Errors &amp; Omissions Expected.
+      </p>
+      <p style="margin:0 0 12px 0;font-size:11px;color:{{ c.muted }};">
+        For feedback please email
+        <a href="mailto:vjohn1@kpmg.com.au" style="color:{{ c.blue }};">Viji John</a>
+      </p>
+      <p style="margin:0 0 20px 0;font-size:11px;color:{{ c.muted }};">
+        <a href="mailto:vjohn1@kpmg.com.au?subject=Kestrel%20Unsubscribe&amp;body=Please%20remove%20me%20from%20the%20Kestrel%20distribution%20list."
+           style="color:{{ c.blue }};">Unsubscribe</a>
+      </p>
+      <!-- Kestrel icon + KPMG logo side by side -->
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td align="right" valign="middle" width="50%" style="padding-right:16px;">
+            {% if icon_b64 %}
+            <img src="data:image/png;base64,{{ icon_b64 }}"
+                 alt="Kestrel" width="36" style="display:inline-block;width:36px;height:auto;opacity:0.85;" />
+            {% endif %}
+          </td>
+          <td align="left" valign="middle" width="50%" style="padding-left:16px;">
+            {% if logo_b64 %}
+            <img src="data:image/png;base64,{{ logo_b64 }}"
+                 alt="KPMG" width="80" style="display:inline-block;width:80px;height:auto;" />
+            {% endif %}
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+</table>
+<!-- /main container -->
+
+</td></tr>
+</table>
+<!-- /outer wrapper -->
+
+</body>
+</html>
