@@ -1,0 +1,12 @@
+.venv/
+.env
+__pycache__/
+*.pyc
+*.log
+*.egg-info/
+data/kestrel.db
+data/kestrel.db-wal
+data/kestrel.db-shm
+output/
+config/kpmg_ca_bundle.pem
+.bootstrap/

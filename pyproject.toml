@@ -1,0 +1,34 @@
+[project]
+name = "kestrel"
+version = "1.0.0"
+description = "Twice-daily Australian Defence brief for a KPMG partner audience."
+requires-python = ">=3.11"
+dependencies = [
+  "httpx",
+  "selectolax",
+  "beautifulsoup4",
+  "lxml",
+  "feedparser",
+  "openpyxl",
+  "pydantic>=2",
+  "jinja2",
+  "anthropic",
+  "python-dateutil",
+  "tenacity",
+  "rapidfuzz",
+  "tzdata",
+  "pyyaml",
+]
+
+[project.scripts]
+kestrel = "kestrel.__main__:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-cov"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

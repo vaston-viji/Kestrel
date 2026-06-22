@@ -1,0 +1,21 @@
+timezone: Australia/Sydney
+schedule:
+  morning: "07:00"
+  afternoon: "11:30"
+paths:
+  data_dir: "./data"
+  output_dir: "./output"
+  assets_dir: "./assets"
+run:
+  global_time_budget_seconds: 7200
+  per_source_timeout_seconds: 30
+  lookback_hours:
+    morning: 18
+    afternoon: 6
+  shipped_suppression_days: 5
+synthesis:
+  provider: "anthropic"
+  model: "claude-sonnet-4-6"
+  max_retries: 3
+brief:
+  theme: "light"                # "light" | "dark"

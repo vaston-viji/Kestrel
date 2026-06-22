@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(fewer-permission-prompts)",
+      "Skill(update-config)",
+      "WebFetch(domain:www.austal.com)",
+      "WebFetch(domain:www.auroralabs3d.com)",
+      "WebFetch(domain:highcom.group)",
+      "WebFetch(domain:ir.highcom.group)",
+      "WebFetch(domain:investor.austal.com)",
+      "WebFetch(domain:quickstep.com.au)",
+      "WebFetch(domain:www.quickstep.com.au)",
+      "WebFetch(domain:www.asx.com.au)",
+      "WebSearch",
+      "WebFetch(domain:www.military-quotes.com)",
+      "WebFetch(domain:civfanatics.com)",
+      "WebFetch(domain:www.brainyquote.com)",
+      "WebFetch(domain:theprinciplesofwar.com)",
+      "Artifact"
+    ]
+  }
+}
