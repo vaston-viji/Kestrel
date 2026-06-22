@@ -20,7 +20,7 @@ _SECTION_KEYWORDS: dict[str, list[str]] = {
     ],
 }
 
-_KPMG_KEYWORDS: dict[str, list[str]] = {
+_KESTREL_KEYWORDS: dict[str, list[str]] = {
     "Cyber": ["cyber", "security", "breach", "vulnerability", "hack", "incident"],
     "Workforce": ["workforce", "hiring", "recruitment", "training", "personnel", "staff"],
     "Deals": ["contract", "deal", "acquisition", "merger", "awarded", "tender", "procurement"],
@@ -87,10 +87,10 @@ class FallbackSynthesizer:
 
     def classify(self, item: RawItem, taxonomy: Taxonomy) -> Classification:
         combined = f"{item.title} {item.snippet}"
-        kpmg_tags = _match_keywords(combined, _KPMG_KEYWORDS)
+        kestrel_tags = _match_keywords(combined, _KESTREL_KEYWORDS)
         domain_tags = _match_keywords(combined, _DOMAIN_KEYWORDS)
         # Filter to only configured tags
-        kpmg_tags = [t for t in kpmg_tags if t in taxonomy.kpmg_tags]
+        kestrel_tags = [t for t in kestrel_tags if t in taxonomy.kestrel_tags]
         domain_tags = [t for t in domain_tags if t in taxonomy.domain_tags]
         section = _classify_section(combined)
         # rough escalation for impact estimation
@@ -100,10 +100,10 @@ class FallbackSynthesizer:
         impact = _estimate_impact(combined, escalated)
         sentiment = _estimate_sentiment(combined)
         return Classification(
-            kpmg_tags=kpmg_tags or ["Strategy"],
+            kestrel_tags=kestrel_tags or ["Strategy"],
             domain_tags=domain_tags,
             impact_score=round(impact, 1),
-            kpmg_sentiment=round(sentiment, 1),
+            kestrel_sentiment=round(sentiment, 1),
             primary_section=section,
         )
 
@@ -119,7 +119,7 @@ class FallbackSynthesizer:
         return ItemNarrative(
             what_happened=item.snippet or item.title,
             why_it_matters="[[PASTE FROM CLAUDE — why does this matter for Australian Defence?]]",
-            kpmg_angle="[[PASTE FROM CLAUDE — what is the KPMG client conversation here?]]",
+            kestrel_angle="[[PASTE FROM CLAUDE — what is the KPMG client conversation here?]]",
         )
 
     def watchpoints(self, items: list[ScoredItem], style: str) -> list[str]:

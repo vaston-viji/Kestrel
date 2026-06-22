@@ -74,8 +74,6 @@ def render_html(brief: Brief, assets_dir: Path, theme: str, project_root: Path) 
 
     # Outlook 600×200 is the recommended default per brand rebuild guide README
     header_path = brand_dir / "marketing" / "email" / f"outlook_header_600x200_{theme}.png"
-    logo_path = assets_dir / "KPMG_logo.png"
-
     # 128 px symbol for footer — transparent on light bg, dark tile on dark bg
     icon_variant = "transparent" if theme == "light" else "dark_tile"
     icon_path = brand_dir / "icons" / f"kestrel_symbol_128_{icon_variant}.png"
@@ -90,7 +88,6 @@ def render_html(brief: Brief, assets_dir: Path, theme: str, project_root: Path) 
         "brief": brief,
         "run_date_display": run_date_display,
         "header_b64": _b64_image(header_path),
-        "logo_b64": _b64_image(logo_path),
         "icon_b64": _b64_image(icon_path),
         "theme": theme,
         "c": _PALETTE.get(theme, _PALETTE["light"]),

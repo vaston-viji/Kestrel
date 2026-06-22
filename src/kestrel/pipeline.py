@@ -217,11 +217,11 @@ def _rate(item: ScoredItem, f: FilterConfig) -> ScoredItem:
         + f.w_signal * item.signal_score
         + f.w_trust * item.trust_score
         + boost
-        + f.w_sentiment * abs(item.classification.kpmg_sentiment)
+        + f.w_sentiment * abs(item.classification.kestrel_sentiment)
     )
     item.rating_total = round(total, 3)
     item.rating_impact = round(f.w_impact * item.classification.impact_score, 3)
-    item.rating_sentiment = round(f.w_sentiment * item.classification.kpmg_sentiment, 3)
+    item.rating_sentiment = round(f.w_sentiment * item.classification.kestrel_sentiment, 3)
     return item
 
 
@@ -284,7 +284,7 @@ def _make_digest_md(
         lines.append(f"- **Source:** {item.source_name}  |  **Rating:** {item.rating_total:.2f}")
         lines.append(f"- **URL:** {item.canonical_url}")
         lines.append(f"- **Confidence:** {item.confidence}  |  **Escalated:** {item.escalated}")
-        lines.append(f"- **KPMG tags:** {', '.join(item.classification.kpmg_tags) or '—'}")
+        lines.append(f"- **Kestrel tags:** {', '.join(item.classification.kestrel_tags) or '—'}")
         lines.append(f"- **Domain tags:** {', '.join(item.classification.domain_tags) or '—'}")
         if item.snippet:
             lines.append(f"- **Snippet:** {item.snippet[:200]}")
@@ -489,7 +489,7 @@ def run(slot: str, cfg: AppConfig, db: KestrelDB) -> dict[str, Any]:
             narrative=ItemNarrative(
                 what_happened=i.snippet or i.title,
                 why_it_matters="",
-                kpmg_angle="",
+                kestrel_angle="",
             ),
             section="",
         ) for i in items]

@@ -48,7 +48,7 @@ def render_text(brief: Brief) -> str:
                 parts.append(f"  [{bi.scored.confidence.upper()} CONFIDENCE]")
             parts.append(f"  What happened: {bi.narrative.what_happened}")
             parts.append(f"  Why it matters: {bi.narrative.why_it_matters}")
-            parts.append(f"  Kestrel Angle: {bi.narrative.kpmg_angle}")
+            parts.append(f"  Kestrel Angle: {bi.narrative.kestrel_angle}")
 
     # Body sections
     _body_section(parts, "POLICY, POSTURE AND GEOPOLITICS", brief.policy_items)
