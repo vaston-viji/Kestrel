@@ -74,7 +74,7 @@ class EscalationRule:
 class AudienceConfig:
     audience: str = "Defence & Industry"
     top_line_max_words: int = 150
-    feedback_email: str = "vjohn1@kpmg.com.au"
+    feedback_email: str = "viji.john@quantrim.com"
 
 
 @dataclass
@@ -127,7 +127,7 @@ def _parse_audience(raw: dict[str, str]) -> AudienceConfig:
     return AudienceConfig(
         audience=raw.get("audience", "KPMG Partners"),
         top_line_max_words=int(raw.get("top_line_max_words", "150")),
-        feedback_email=raw.get("feedback_email", "vjohn1@kpmg.com.au"),
+        feedback_email=raw.get("feedback_email", "viji.john@quantrim.com"),
     )
 
 

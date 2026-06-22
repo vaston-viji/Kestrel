@@ -117,7 +117,7 @@ def test_text_render_contains_all_sections():
     assert "TOP LINE" in txt
     assert "PRIORITY DEVELOPMENTS" in txt
     assert "WATCHPOINTS" in txt
-    assert "vjohn1@kpmg.com.au" in txt
+    assert "viji.john@quantrim.com" in txt
     assert "Errors & Omissions Expected" in txt
 
 

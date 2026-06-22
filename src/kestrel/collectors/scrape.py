@@ -18,7 +18,7 @@ from kestrel.collectors.page_cache import get_cache, PageCache
 
 log = logging.getLogger(__name__)
 
-UA = "Kestrel/1.0 (Australian Defence Brief; contact vjohn1@kpmg.com.au)"
+UA = "Kestrel/1.0 (Australian Defence Brief; contact viji.john@quantrim.com)"
 HEADERS = {"User-Agent": UA}
 _robots_cache: dict[str, RobotFileParser] = {}
 _robots_lock = threading.Lock()

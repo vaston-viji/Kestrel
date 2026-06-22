@@ -16,7 +16,8 @@
       "WebFetch(domain:civfanatics.com)",
       "WebFetch(domain:www.brainyquote.com)",
       "WebFetch(domain:theprinciplesofwar.com)",
-      "Artifact"
+      "Artifact",
+      "Bash(.venv/Scripts/python -m kestrel run --slot afternoon)"
     ]
   }
 }

@@ -24,7 +24,7 @@ from kestrel.collectors.protocol import parse_notes_hint
 log = logging.getLogger(__name__)
 
 CKAN_SEARCH = "https://data.gov.au/api/3/action/package_search"
-HEADERS = {"User-Agent": "Kestrel/1.0 (Australian Defence Brief; contact vjohn1@kpmg.com.au)"}
+HEADERS = {"User-Agent": "Kestrel/1.0 (Australian Defence Brief; contact viji.john@quantrim.com)"}
 
 
 class DataGovAuCollector:
