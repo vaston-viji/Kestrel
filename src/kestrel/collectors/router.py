@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from kestrel.models import RawItem, Source, Window
 from kestrel.collectors.asx import ASXCollector
 from kestrel.collectors.austender import AusTenderCollector
+from kestrel.collectors.bing_news import BingNewsCollector
 from kestrel.collectors.data_gov_au import DataGovAuCollector
 from kestrel.collectors.google_news import GoogleNewsCollector
 from kestrel.collectors.protocol import parse_notes_hint
@@ -20,6 +21,11 @@ _LINKEDIN_SKIP_MSG = "skipped_linkedin"
 _DEADLINE_MSG = "deadline_exceeded"
 _WORKERS = 20
 
+# Cap concurrent Google News requests — hitting news.google.com with 20 threads
+# simultaneously triggers WinError 10054 (connection forcibly closed). Bing is
+# used as a 4th-tier fallback and tolerates higher concurrency.
+_GNEWS_SEMAPHORE = threading.Semaphore(3)
+
 
 def collect_source(source: Source, window: Window, timeout: int) -> tuple[list[RawItem], str | None]:
     """Return (items, error_msg). error_msg is None on success."""
@@ -29,22 +35,46 @@ def collect_source(source: Source, window: Window, timeout: int) -> tuple[list[R
 
     if source.type.upper() == "ASX":
         collector: object = ASXCollector(timeout=timeout)
+        try:
+            items = collector.collect(source, window)
+            return items, None
+        except Exception as exc:
+            log.warning("Collect error for %s: %s", source.name, exc)
+            return [], f"collect_error: {exc}"
     elif source.type.upper() == "AUSTENDER":
         collector = AusTenderCollector(timeout=timeout)
+        try:
+            items = collector.collect(source, window)
+            return items, None
+        except Exception as exc:
+            log.warning("Collect error for %s: %s", source.name, exc)
+            return [], f"collect_error: {exc}"
     elif parse_notes_hint(source.notes, "ckan"):
         collector = DataGovAuCollector(timeout=timeout)
+        try:
+            items = collector.collect(source, window)
+            return items, None
+        except Exception as exc:
+            log.warning("Collect error for %s: %s", source.name, exc)
+            return [], f"collect_error: {exc}"
     elif parse_notes_hint(source.notes, "gnews"):
-        # Explicit Google News query — skip RSS/scrape entirely
-        collector = GoogleNewsCollector(timeout=timeout)
+        # Explicit Google News query — throttled to avoid rate limits
+        try:
+            with _GNEWS_SEMAPHORE:
+                items = GoogleNewsCollector(timeout=timeout).collect(source, window)
+            if items:
+                return items, None
+        except Exception as exc:
+            log.warning("Google News collect error for %s: %s", source.name, exc)
+        # Fall through to Bing if GNews returns nothing or errors
+        try:
+            items = BingNewsCollector(timeout=timeout).collect(source, window)
+            return items, None
+        except Exception as exc:
+            log.warning("Bing News fallback error for %s: %s", source.name, exc)
+            return [], f"collect_error: {exc}"
     else:
         return _rss_scrape_gnews(source, window, timeout)
-
-    try:
-        items = collector.collect(source, window)
-        return items, None
-    except Exception as exc:
-        log.warning("Collect error for %s: %s", source.name, exc)
-        return [], f"collect_error: {exc}"
 
 
 def _rss_scrape_gnews(
@@ -70,12 +100,21 @@ def _rss_scrape_gnews(
     except Exception as exc:
         log.warning("Scrape failed for %s: %s", source.name, exc)
 
-    # Google News index search (always tried as last resort)
+    # Google News (throttled — max 3 concurrent)
     try:
-        items = GoogleNewsCollector(timeout=timeout).collect(source, window)
-        return items, None
+        with _GNEWS_SEMAPHORE:
+            items = GoogleNewsCollector(timeout=timeout).collect(source, window)
+        if items:
+            return items, None
     except Exception as exc:
         log.warning("Google News fallback failed for %s: %s", source.name, exc)
+
+    # Bing News (final fallback — more rate-limit-tolerant than Google News)
+    try:
+        items = BingNewsCollector(timeout=timeout).collect(source, window)
+        return items, None
+    except Exception as exc:
+        log.warning("Bing News fallback failed for %s: %s", source.name, exc)
         return [], f"collect_error: {exc}"
 
 
