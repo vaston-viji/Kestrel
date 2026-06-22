@@ -1,6 +1,7 @@
 """Re-render the HTML for the most recent completed run without re-collecting or re-classifying."""
 from __future__ import annotations
 import json
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -16,7 +17,39 @@ from kestrel.render.subject import make_subject
 from kestrel.store.db import KestrelDB
 
 
-def _load_brief_from_db(db: KestrelDB, slot: str) -> tuple[Brief, str] | None:
+def _parse_txt(txt_path: Path) -> tuple[list[str], tuple[str, str], list[str]]:
+    """Extract top_line bullets, quote, and watchpoints from the plain-text output."""
+    if not txt_path.exists():
+        return [], ("", ""), []
+
+    text = txt_path.read_text(encoding="utf-8")
+    top_line: list[str] = []
+    quote: tuple[str, str] = ("", "")
+    watchpoints: list[str] = []
+
+    # Top Line section: lines starting with "- " between TOP LINE header and next section
+    tl_match = re.search(r"TOP LINE\n-+\n(.*?)(?:\n[A-Z]|\Z)", text, re.DOTALL)
+    if tl_match:
+        for line in tl_match.group(1).splitlines():
+            if line.startswith("- "):
+                top_line.append(line)
+
+    # Quote: "..." followed by  — author on next line
+    q_match = re.search(r'"([^"]+)"\n\s+—\s+(.+)', text)
+    if q_match:
+        quote = (q_match.group(1).strip(), q_match.group(2).strip())
+
+    # Watchpoints section
+    wp_match = re.search(r"WATCHPOINTS\n-+\n(.*?)(?:\n={3,}|\Z)", text, re.DOTALL)
+    if wp_match:
+        for line in wp_match.group(1).splitlines():
+            if line.startswith("- "):
+                watchpoints.append(line)
+
+    return top_line, quote, watchpoints
+
+
+def _load_brief_from_db(db: KestrelDB, slot: str, output_dir: Path) -> tuple[Brief, str] | None:
     conn = db._conn
     row = conn.execute(
         "SELECT run_id, run_date, late, started_at FROM runs "
@@ -97,18 +130,21 @@ def _load_brief_from_db(db: KestrelDB, slot: str) -> tuple[Brief, str] | None:
     started_at = datetime.fromisoformat(started_at_str)
     subject = make_subject(slot, started_at, "Australia/Sydney")
 
+    txt_path = output_dir / run_date / f"kestrel_{slot}_{run_date}.txt"
+    top_line, quote, watchpoints = _parse_txt(txt_path)
+
     brief = Brief(
         slot=slot,
         run_date=run_date,
         is_late=bool(late),
         generated_at=started_at,
-        top_line=[],
-        quote=("", ""),
+        top_line=top_line,
+        quote=quote,
         priority_items=priority,
         policy_items=policy,
         market_items=market,
         tech_items=tech,
-        watchpoints=[],
+        watchpoints=watchpoints,
         digest_md="",
         subject=subject,
     )
@@ -128,7 +164,7 @@ if __name__ == "__main__":
     cfg = load_config(root)
     db = KestrelDB(cfg.paths.data_dir / "kestrel.db")
 
-    result = _load_brief_from_db(db, args.slot)
+    result = _load_brief_from_db(db, args.slot, cfg.paths.output_dir)
     if not result:
         print(f"No completed {args.slot} run found in DB.")
         sys.exit(1)
