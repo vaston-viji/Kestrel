@@ -4,7 +4,7 @@
 1. Tasks fire at 07:00 and 11:30 (Australia/Sydney). The machine must be on or able to wake.
 2. Each run writes to `output/YYYY-MM-DD/`. Open `kestrel_<slot>_<date>.html` to review.
 3. In `fallback` mode, also open `...digest.md` and fill the `[[PASTE FROM CLAUDE]]` blocks
-   (Top Line, KPMG angles, Watchpoints) using Claude, then re-save the HTML.
+   (Top Line, Kestrel Angles, Watchpoints) using Claude, then re-save the HTML.
 4. Read the console summary for `needs_attention` sources and the suggested recipient count.
 5. Forward the HTML to the partner distribution. Subject line is in `subject.txt`.
 

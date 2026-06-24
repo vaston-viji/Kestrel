@@ -6,7 +6,7 @@ from typing import Optional
 import yaml
 
 from kestrel.models import Source, Taxonomy
-from kestrel.store.excel import read_sources, read_kestrel_config, read_subscribers
+from kestrel.store.excel import read_sources, read_kestrel_config, read_subscribers, read_austender_agencies
 
 
 # ---------------------------------------------------------------------------
@@ -95,6 +95,7 @@ class AppConfig:
     writing_style_rules: list[dict]
     audience: AudienceConfig
     subscribers: list[dict]
+    austender_agencies: list[dict]   # [{name, category, active, notes}]
     # derived paths (absolute)
     project_root: Path
 
@@ -125,7 +126,7 @@ def _parse_filters(raw: dict[str, str]) -> FilterConfig:
 
 def _parse_audience(raw: dict[str, str]) -> AudienceConfig:
     return AudienceConfig(
-        audience=raw.get("audience", "KPMG Partners"),
+        audience=raw.get("audience", "Defence & Industry"),
         top_line_max_words=int(raw.get("top_line_max_words", "150")),
         feedback_email=raw.get("feedback_email", "viji.john@quantrim.com"),
     )
@@ -152,6 +153,7 @@ def load_config(project_root: Path) -> AppConfig:
     raw_sources = read_sources(source_path)
     raw_config = read_kestrel_config(config_path)
     subscribers = read_subscribers(sub_path)
+    austender_agencies = read_austender_agencies(config_path)
 
     sources = [Source(**s) for s in raw_sources]
     filters = _parse_filters(raw_config["filters"])
@@ -198,6 +200,7 @@ def load_config(project_root: Path) -> AppConfig:
         writing_style_rules=raw_config["writing_style_rules"],
         audience=audience,
         subscribers=subscribers,
+        austender_agencies=austender_agencies,
         project_root=project_root,
     )
 

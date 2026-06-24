@@ -15,8 +15,8 @@ def _item(section: str, rating: float, escalated: bool = False) -> ScoredItem:
         published_at=None,
         snippet="",
         classification=Classification(
-            kpmg_tags=[], domain_tags=[],
-            impact_score=3.0, kpmg_sentiment=0.0, primary_section=section,
+            kestrel_tags=[], domain_tags=[],
+            impact_score=3.0, kestrel_sentiment=0.0, primary_section=section,
         ),
         rating_total=rating, rating_impact=0.0, rating_sentiment=0.0,
         trust_score=3.0, signal_score=3.0, escalated=escalated,

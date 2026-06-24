@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 
 
 def _build_ssl_context(project_root: Path) -> ssl.SSLContext | None:
-    """Return an SSLContext that trusts the KPMG Netskope CA, or None to use certifi default."""
+    """Return an SSLContext that trusts a corporate CA bundle, or None to use certifi default."""
     ca_bundle = project_root / "config" / "kpmg_ca_bundle.pem"
     if not ca_bundle.exists():
         return None
@@ -25,7 +25,7 @@ def _build_ssl_context(project_root: Path) -> ssl.SSLContext | None:
     # Netskope CA does not mark BasicConstraints as critical — relax strict X.509 checking.
     if hasattr(ssl, "VERIFY_X509_STRICT"):
         ctx.verify_flags &= ~ssl.VERIFY_X509_STRICT
-    log.debug("Using KPMG CA bundle for Anthropic API SSL: %s", ca_bundle)
+    log.debug("Using corporate CA bundle for Anthropic API SSL: %s", ca_bundle)
     return ctx
 
 
@@ -73,7 +73,7 @@ class AnthropicSynthesizer:
         self._root = project_root
         self._style = _load_style(project_root)
         # Set True on first APIConnectionError so all remaining calls skip the API immediately.
-        # Prevents 39-min classify drain when KPMG proxy blocks api.anthropic.com.
+        # Prevents 39-min classify drain when a corporate proxy blocks api.anthropic.com.
         self._proxy_blocked = False
 
     def _call(self, prompt: str, max_tokens: int = 1024) -> str:

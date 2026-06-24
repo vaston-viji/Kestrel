@@ -17,7 +17,9 @@
       "WebFetch(domain:www.brainyquote.com)",
       "WebFetch(domain:theprinciplesofwar.com)",
       "Artifact",
-      "Bash(.venv/Scripts/python -m kestrel run --slot afternoon)"
+      "Bash(.venv/Scripts/python -m kestrel run --slot afternoon)",
+      "Skill(artifact-design)",
+      "Bash(C:/Claude/kestrel/.venv/Scripts/kestrel.exe run *)"
     ]
   }
 }

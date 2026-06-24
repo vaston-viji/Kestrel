@@ -119,7 +119,7 @@ class FallbackSynthesizer:
         return ItemNarrative(
             what_happened=item.snippet or item.title,
             why_it_matters="[[PASTE FROM CLAUDE — why does this matter for Australian Defence?]]",
-            kestrel_angle="[[PASTE FROM CLAUDE — what is the KPMG client conversation here?]]",
+            kestrel_angle="[[PASTE FROM CLAUDE — what is the Kestrel Angle for Defence and sovereign industry?]]",
         )
 
     def watchpoints(self, items: list[ScoredItem], style: str) -> list[str]:
