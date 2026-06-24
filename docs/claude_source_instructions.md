@@ -242,7 +242,7 @@ Each item should answer:
 
 - what happened
 - why it matters
-- why KPMG should care
+- why this matters for Australian Defence and sovereign industry
 - what to watch next
 
 ## Recommended next build step

@@ -188,6 +188,33 @@ def read_kestrel_config(path: Path) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# AusTender agency filter list (from kestrel_config.xlsx)
+# ---------------------------------------------------------------------------
+
+def read_austender_agencies(path: Path) -> list[dict]:
+    """Return active AusTender agency filter entries from the AusTender_Agencies sheet."""
+    wb = _load(path)
+    if "AusTender_Agencies" not in wb.sheetnames:
+        wb.close()
+        return []
+    ws = _sheet(wb, "AusTender_Agencies", path)
+    rows = _rows_as_dicts(
+        ws, ["Agency Name", "Category", "Active"], path, "AusTender_Agencies"
+    )
+    wb.close()
+    return [
+        {
+            "name": _str(r.get("agency_name")),
+            "category": _str(r.get("category")),
+            "active": _bool_yes(r.get("active")),
+            "notes": _str(r.get("notes")),
+        }
+        for r in rows
+        if _str(r.get("agency_name")) and _bool_yes(r.get("active"))
+    ]
+
+
+# ---------------------------------------------------------------------------
 # subscribers.xlsx
 # ---------------------------------------------------------------------------
 

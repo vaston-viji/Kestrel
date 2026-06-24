@@ -1,7 +1,7 @@
 [project]
 name = "kestrel"
 version = "1.0.0"
-description = "Twice-daily Australian Defence brief for a KPMG partner audience."
+description = "Twice-daily Australian Defence and sovereign industry intelligence brief."
 requires-python = ">=3.11"
 dependencies = [
   "httpx",

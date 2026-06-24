@@ -26,8 +26,8 @@ _PALETTE: dict[str, dict[str, str]] = {
         tag_bg="#8A6BCD",       # Violet chip background
         tag_text="#FFFFFF",     # White chip text
         quote_bg="#EDECEF",     # Quote block background (mist grey)
-        angle_bg="#F0EBF8",     # KPMG angle sidebar background (light violet tint)
-        angle_bdr="#8A6BCD",    # KPMG angle sidebar border
+        angle_bg="#F0EBF8",     # Kestrel Angle sidebar background (light violet tint)
+        angle_bdr="#8A6BCD",    # Kestrel Angle sidebar border
         hdr_bg="#2F364A",       # Fallback header background
         hdr_sub="#8A6BCD",      # Fallback header sub-label colour
         late_bg="#6451B3",      # Indigo — late-run banner
@@ -45,7 +45,7 @@ _PALETTE: dict[str, dict[str, str]] = {
         tag_bg="#6451B3",       # Indigo chip background
         tag_text="#FFFFFF",     # White chip text
         quote_bg="#3A4152",     # Quote block background
-        angle_bg="#3A4152",     # KPMG angle sidebar background
+        angle_bg="#3A4152",     # Kestrel Angle sidebar background
         angle_bdr="#6451B3",    # Indigo angle border
         hdr_bg="#2F364A",       # Fallback header background
         hdr_sub="#8A6BCD",      # Fallback header sub-label colour
@@ -72,8 +72,8 @@ def render_html(brief: Brief, assets_dir: Path, theme: str, project_root: Path) 
 
     brand_dir = assets_dir / "brand" / "kestrel_brand_rebuild_pack"
 
-    # Outlook 600×200 is the recommended default per brand rebuild guide README
-    header_path = brand_dir / "marketing" / "email" / f"outlook_header_600x200_{theme}.png"
+    # Use the original high-resolution source logo on the brand grey background
+    logo_path = brand_dir / "source_assets" / "kestrel_logo_original.png"
     # 128 px symbol for footer — transparent on light bg, dark tile on dark bg
     icon_variant = "transparent" if theme == "light" else "dark_tile"
     icon_path = brand_dir / "icons" / f"kestrel_symbol_128_{icon_variant}.png"
@@ -87,7 +87,7 @@ def render_html(brief: Brief, assets_dir: Path, theme: str, project_root: Path) 
     context = {
         "brief": brief,
         "run_date_display": run_date_display,
-        "header_b64": _b64_image(header_path),
+        "logo_b64": _b64_image(logo_path),
         "icon_b64": _b64_image(icon_path),
         "theme": theme,
         "c": _PALETTE.get(theme, _PALETTE["light"]),

@@ -21,26 +21,25 @@
 <table width="840" cellpadding="0" cellspacing="0" border="0" style="max-width:840px;width:100%;background:{{ c.container }};border-radius:4px;overflow:hidden;">
 
   <!-- ============================================================
-       MASTHEAD
+       MASTHEAD — source logo on brand grey background
   ============================================================ -->
   <tr>
-    <td style="padding:0;">
-      {% if header_b64 %}
-      <img src="data:image/png;base64,{{ header_b64 }}"
-           alt="Kestrel D&DI Market Scan"
-           width="840" style="display:block;width:100%;max-width:840px;height:auto;border:0;" />
-      {% else %}
-      <!-- Fallback masthead if image is unavailable -->
+    <td style="padding:0;background:#EDECEF;">
       <table width="100%" cellpadding="0" cellspacing="0" border="0"
-             style="background:{{ c.hdr_bg }};">
+             style="background:#EDECEF;">
         <tr>
-          <td style="padding:32px 40px;">
-            <div style="font-size:28px;font-weight:700;color:#ffffff;letter-spacing:2px;">KESTREL</div>
-            <div style="font-size:11px;color:{{ c.hdr_sub }};margin-top:4px;letter-spacing:2px;text-transform:uppercase;">Defence Insights</div>
+          <td style="padding:28px 40px;text-align:center;">
+            {% if logo_b64 %}
+            <img src="data:image/png;base64,{{ logo_b64 }}"
+                 alt="Kestrel"
+                 height="72" style="display:inline-block;height:72px;width:auto;border:0;" />
+            {% else %}
+            <div style="font-size:32px;font-weight:700;color:{{ c.body }};letter-spacing:3px;">KESTREL</div>
+            <div style="font-size:11px;color:{{ c.violet }};margin-top:4px;letter-spacing:2px;text-transform:uppercase;">Defence &amp; Industry Intelligence</div>
+            {% endif %}
           </td>
         </tr>
       </table>
-      {% endif %}
     </td>
   </tr>
 
@@ -55,22 +54,22 @@
   </tr>
   {% endif %}
 
-  <!-- Descriptor line -->
+  <!-- Disclaimer line (below masthead, above grey banner) -->
   <tr>
-    <td style="padding:20px 40px 0 40px;border-bottom:2px solid {{ c.border }};">
-      <p style="margin:0 0 8px 0;font-size:13px;color:{{ c.body }};font-style:italic;text-align:center;">
-        The developments that matter for Australian Defence, sovereign industry and national resilience.
-      </p>
-      <p style="margin:0 0 16px 0;font-size:11px;color:{{ c.muted }};text-align:center;">
+    <td style="padding:10px 40px 0 40px;">
+      <p style="margin:0;font-size:11px;color:{{ c.muted }};text-align:center;">
         Sourced through an AI generated market scan where errors, omissions and hallucinations are expected. Reach out to help us improve the scan.
       </p>
     </td>
   </tr>
 
-  <!-- Slot / date bar -->
+  <!-- Slot / date bar — includes tagline -->
   <tr>
-    <td style="padding:12px 40px;background:{{ c.stripe }};border-bottom:1px solid {{ c.border }};">
-      <p style="margin:0;font-size:12px;color:{{ c.body }};">
+    <td style="padding:14px 40px;background:{{ c.stripe }};border-top:1px solid {{ c.border }};border-bottom:1px solid {{ c.border }};">
+      <p style="margin:0 0 4px 0;font-size:13px;color:{{ c.body }};font-style:italic;text-align:center;">
+        The developments that matter for Australian Defence, sovereign industry and national resilience.
+      </p>
+      <p style="margin:0;font-size:12px;color:{{ c.muted }};text-align:center;">
         <strong>{{ brief.slot|title }} Brief</strong> &nbsp;·&nbsp; {{ run_date_display }}
       </p>
     </td>
@@ -247,6 +246,31 @@
   {% endif %}
 
   <!-- ============================================================
+       AUSTENDER MOVEMENT — top contract events by value
+  ============================================================ -->
+  {% if brief.austender_contracts %}
+  <tr>
+    <td style="padding:20px 40px 8px 40px;border-top:1px solid {{ c.border }};">
+      <h2 style="margin:0 0 12px 0;font-size:16px;font-weight:700;color:{{ c.violet }};
+                 text-transform:uppercase;letter-spacing:1px;padding-bottom:8px;">
+        AusTender Movement — Highest Value Contract Events
+      </h2>
+      <ul style="margin:0;padding:0 0 0 18px;">
+        {% for ct in brief.austender_contracts %}
+        <li style="margin:0 0 7px 0;font-size:11px;color:{{ c.body }};line-height:1.6;">
+          <a href="{{ ct.url }}" style="color:{{ c.blue }};font-weight:600;text-decoration:none;">{{ ct.cn_id }}</a>
+          &nbsp;—&nbsp;<span style="color:{{ c.muted }};">{{ ct.agency }}</span>
+          &nbsp;—&nbsp;<span style="color:{{ c.muted }};">{{ ct.supplier }}</span>
+          &nbsp;—&nbsp;{{ ct.title }}
+          &nbsp;—&nbsp;<strong>${{ "{:,.0f}".format(ct.value) }}</strong>
+        </li>
+        {% endfor %}
+      </ul>
+    </td>
+  </tr>
+  {% endif %}
+
+  <!-- ============================================================
        FOOTNOTE
   ============================================================ -->
   <tr>
@@ -254,12 +278,12 @@
       <p style="margin:0 0 6px 0;font-size:11px;color:{{ c.muted }};">
         This email was created by AI. Errors &amp; Omissions Expected.
       </p>
-      <p style="margin:0 0 12px 0;font-size:11px;color:{{ c.muted }};">
-        For feedback please email
-        <a href="mailto:viji.john@quantrim.com" style="color:{{ c.blue }};">Viji John</a>
+      <p style="margin:0 0 6px 0;font-size:11px;color:{{ c.muted }};">
+        For feedback or sponsorship interest, please contact
+        <a href="mailto:product@quantrim.com" style="color:{{ c.blue }};">Quantrim</a>.
       </p>
       <p style="margin:0 0 20px 0;font-size:11px;color:{{ c.muted }};">
-        <a href="mailto:viji.john@quantrim.com?subject=Kestrel%20Unsubscribe&amp;body=Please%20remove%20me%20from%20the%20Kestrel%20distribution%20list."
+        <a href="mailto:product@quantrim.com?subject=Kestrel%20Unsubscribe&amp;body=Please%20remove%20me%20from%20the%20Kestrel%20distribution%20list.%20Name%3A%20%5Byour%20name%5D"
            style="color:{{ c.blue }};">Unsubscribe</a>
       </p>
       <!-- Kestrel icon -->

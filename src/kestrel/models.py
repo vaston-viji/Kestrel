@@ -93,6 +93,17 @@ class BriefItem:
 
 
 @dataclass
+class AusTenderContract:
+    cn_id: str
+    title: str
+    url: str
+    agency: str
+    supplier: str
+    value: int                   # integer dollars
+    description: str             # ≤10 word summary
+
+
+@dataclass
 class Brief:
     slot: str                    # 'morning' | 'afternoon'
     run_date: str                # ISO date string
@@ -107,3 +118,4 @@ class Brief:
     watchpoints: list[str]       # bullet strings
     digest_md: str               # structured digest for fallback / paste-in
     subject: str
+    austender_contracts: list    # list[AusTenderContract], top 10 by value

@@ -3,7 +3,7 @@
 **"We scan fast, see early and surface what matters."**
 
 A local, twice-daily brief on Australian Defence and adjacent national-interest developments,
-written for a KPMG partner audience. Kestrel collects from a maintained source registry, ranks
+written for Australian Defence, sovereign industry and national security professionals. Kestrel collects from a maintained source registry, ranks
 and de-duplicates, uses a language model to write the judgement layer, and renders a
 self-contained HTML email for a human to review and send.
 
@@ -16,7 +16,7 @@ self-contained HTML email for a human to review and send.
   HTML brief with `[[PASTE FROM CLAUDE]]` placeholders for the judgement layer).
 
 ## Blocking prerequisite for full automation
-A working `ANTHROPIC_API_KEY` (or an approved KPMG-hosted model endpoint). Until that is in
+A working `ANTHROPIC_API_KEY` (or a self-hosted model endpoint). Until that is in
 place, run in `fallback` mode. See `SPEC.md` §7.
 
 ## Quickstart

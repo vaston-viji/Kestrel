@@ -1,7 +1,7 @@
 """AusTender contract notice collector.
 
-Uses Selenium + Chrome to render the JavaScript-heavy AusTender search page
-and extract contract notices > $1M published within the lookback window.
+Uses Selenium + Chrome to navigate the AusTender search form,
+paginate all results, and return contracts above the min value.
 
 Prerequisites:
   - chromedriver.exe at C:/Claude/kestrel/drivers/chromedriver.exe
@@ -37,15 +37,23 @@ def _build_driver(timeout: int = 20) -> webdriver.Chrome:
     options.add_argument("--no-sandbox")
     options.add_argument("--window-size=1920,1080")
     options.add_argument("--disable-blink-features=AutomationControlled")
+    options.add_argument(
+        "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36"
+    )
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
     options.add_experimental_option("useAutomationExtension", False)
     options.binary_location = CHROME_PATH
     service = Service(executable_path=DRIVER_PATH)
-    return webdriver.Chrome(service=service, options=options)
+    drv = webdriver.Chrome(service=service, options=options)
+    drv.execute_script(
+        "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
+    )
+    return drv
 
 
 def _parse_value(text: str) -> Optional[int]:
-    """Parse '$1,234,567' -> 1234567."""
+    """Parse '$1,234,567.89' -> 1234567."""
     m = re.search(r"[\d,]+", text.replace("$", "").replace(" ", ""))
     if m:
         try:
@@ -53,6 +61,52 @@ def _parse_value(text: str) -> Optional[int]:
         except ValueError:
             pass
     return None
+
+
+def _extract_boxes(driver: webdriver.Chrome) -> list[dict]:
+    """Extract all listInner boxes from the current page."""
+    boxes = driver.find_elements(By.CSS_SELECTOR, "div.listInner")
+    results = []
+    for box in boxes:
+        data: dict = {}
+        descs = box.find_elements(By.CSS_SELECTOR, "div.list-desc")
+        for desc in descs:
+            try:
+                span = desc.find_element(By.TAG_NAME, "span")
+                inner = desc.find_element(By.CSS_SELECTOR, "div.list-desc-inner")
+                label = span.text.strip().rstrip(":")
+                if label == "CN ID":
+                    data["cn_id"] = inner.text.strip()
+                    try:
+                        link = inner.find_element(By.TAG_NAME, "a")
+                        href = link.get_attribute("href") or ""
+                        data["url"] = (
+                            href if href.startswith("http") else BASE_URL + href
+                        )
+                    except Exception:
+                        pass
+                elif label == "Agency":
+                    data["agency"] = inner.text.strip()
+                elif label == "Contract Value (AUD)":
+                    data["value_text"] = inner.text.strip()
+                    data["value"] = _parse_value(inner.text) or 0
+                elif label == "Supplier Name":
+                    data["supplier"] = inner.text.strip()
+                elif label in ("\xa0", ""):
+                    # Full Details link carries the contract title in its title attr
+                    try:
+                        link = inner.find_element(By.CSS_SELECTOR, "a.detail")
+                        title_attr = link.get_attribute("title") or ""
+                        prefix = "Full Details for "
+                        if title_attr.startswith(prefix):
+                            data["title"] = title_attr[len(prefix):]
+                    except Exception:
+                        pass
+            except Exception:
+                pass
+        if data.get("cn_id") and data.get("value", 0) > 0:
+            results.append(data)
+    return results
 
 
 class AusTenderCollector:
@@ -68,70 +122,93 @@ class AusTenderCollector:
             )
             return []
 
-        date_start = window.start.strftime("%Y-%m-%d")
-        date_end = window.end.strftime("%Y-%m-%d")
-        url = (
-            f"{BASE_URL}/Cn/Search"
-            f"?dateType=Publish+Date"
-            f"&dateStart={date_start}"
-            f"&dateEnd={date_end}"
-            f"&ValueFrom={self._min_value}"
-        )
+        date_start = window.start.strftime("%d-%b-%Y")
+        date_end = window.end.strftime("%d-%b-%Y")
 
         driver = None
         try:
             driver = _build_driver(self._timeout)
-            driver.get(url)
 
-            wait = WebDriverWait(driver, 15)
-            try:
-                wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "table.results tbody tr")))
-            except Exception:
-                log.warning("AusTender: results table not found within timeout for %s", url)
-                return []
+            # Step 1: submit the search form
+            driver.get(f"{BASE_URL}/Cn/Search")
+            WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.ID, "form-dateType-PublishDate"))
+            )
+            driver.find_element(By.ID, "form-dateType-PublishDate").click()
+            ds = driver.find_element(By.ID, "dateStart")
+            ds.clear(); ds.send_keys(date_start)
+            de = driver.find_element(By.ID, "dateEnd")
+            de.clear(); de.send_keys(date_end)
+            vf = driver.find_element(By.ID, "form-ValueFrom")
+            vf.clear(); vf.send_keys(str(self._min_value))
+            for btn in driver.find_elements(By.TAG_NAME, "button"):
+                if "search" in btn.text.strip().lower():
+                    btn.click()
+                    break
 
-            rows = driver.find_elements(By.CSS_SELECTOR, "table.results tbody tr")
-            items = []
-            for row in rows:
+            WebDriverWait(driver, 20).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "div.listInner"))
+            )
+
+            # Step 2: collect page 1
+            all_data = _extract_boxes(driver)
+            log.info("AusTender page 1: %d contracts", len(all_data))
+
+            # Step 3: paginate remaining pages via direct URL
+            pagination = driver.find_elements(
+                By.CSS_SELECTOR, ".pagination a[href*='page=']"
+            )
+            page_urls = {}
+            for link in pagination:
+                href = link.get_attribute("href") or ""
+                m = re.search(r"page=(\d+)", href)
+                if m:
+                    page_urls[int(m.group(1))] = href
+
+            for page_num in sorted(p for p in page_urls if p > 1):
+                driver.get(page_urls[page_num])
                 try:
-                    cells = row.find_elements(By.TAG_NAME, "td")
-                    if len(cells) < 5:
-                        continue
-                    cn_id = cells[0].text.strip()
-                    title = cells[1].text.strip()
-                    agency = cells[2].text.strip()
-                    supplier = cells[3].text.strip()
-                    value_text = cells[4].text.strip()
-                    value = _parse_value(value_text)
-
-                    if value is not None and value < self._min_value:
-                        continue
-
-                    link_el = cells[1].find_elements(By.TAG_NAME, "a")
-                    href = link_el[0].get_attribute("href") if link_el else ""
-                    if href and not href.startswith("http"):
-                        href = BASE_URL + href
-
-                    snippet = f"[{cn_id}] {agency} | Supplier: {supplier} | Value: {value_text}"
-
-                    items.append(RawItem(
-                        title=title or f"Contract Notice {cn_id}",
-                        url=href or f"{BASE_URL}/Cn/View/{cn_id}",
-                        source_name=source.name,
-                        published_at=None,
-                        snippet=snippet,
-                        raw_meta={
-                            "cn_id": cn_id,
-                            "agency": agency,
-                            "supplier": supplier,
-                            "value": value,
-                        },
-                    ))
-
+                    WebDriverWait(driver, 15).until(
+                        EC.presence_of_element_located(
+                            (By.CSS_SELECTOR, "div.listInner")
+                        )
+                    )
+                    page_data = _extract_boxes(driver)
+                    all_data.extend(page_data)
+                    log.info("AusTender page %d: %d contracts", page_num, len(page_data))
                 except Exception as exc:
-                    log.debug("AusTender row parse error: %s", exc)
+                    log.warning("AusTender page %d error: %s", page_num, exc)
 
-            log.info("AusTender -> %d contracts > $%s", len(items), f"{self._min_value:,}")
+            # Build RawItems from collected data
+            items = []
+            for d in all_data:
+                if d.get("value", 0) < self._min_value:
+                    continue
+                cn_id = d.get("cn_id", "")
+                title = d.get("title") or f"Contract Notice {cn_id}"
+                url = d.get("url") or f"{BASE_URL}/Cn/Show/{cn_id}"
+                agency = d.get("agency", "")
+                supplier = d.get("supplier", "")
+                value = d.get("value", 0)
+                value_text = d.get("value_text", "")
+                snippet = f"[{cn_id}] {agency} | Supplier: {supplier} | Value: {value_text}"
+                items.append(RawItem(
+                    title=title,
+                    url=url,
+                    source_name=source.name,
+                    published_at=None,
+                    snippet=snippet,
+                    raw_meta={
+                        "cn_id": cn_id,
+                        "agency": agency,
+                        "supplier": supplier,
+                        "value": value,
+                    },
+                ))
+
+            log.info(
+                "AusTender -> %d contracts >= $%s", len(items), f"{self._min_value:,}"
+            )
             return items
 
         except Exception as exc:

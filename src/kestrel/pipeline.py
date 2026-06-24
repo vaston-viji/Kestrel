@@ -18,7 +18,7 @@ from rapidfuzz import fuzz
 from kestrel.config import AppConfig, FilterConfig, select_sources
 from kestrel.collectors.router import collect_all
 from kestrel.models import (
-    Brief, BriefItem, Classification, ItemNarrative,
+    AusTenderContract, Brief, BriefItem, Classification, ItemNarrative,
     RawItem, ScoredItem, Source, Taxonomy, Window,
 )
 from kestrel.render.html import render_html
@@ -276,7 +276,7 @@ def _make_digest_md(
     display = all_classified if all_classified else scored
     lines = [
         f"# Kestrel {slot.title()} Brief — {run_date}",
-        f"_Generated in fallback mode. Paste the KPMG angle and Top Line into the HTML._\n",
+        f"_Generated in fallback mode. Paste the Kestrel Angle and Top Line into the HTML._\n",
         f"## Collected and classified items ({len(display)} total, ranked by rating)\n",
     ]
     for i, item in enumerate(display, 1):
@@ -513,6 +513,9 @@ def run(slot: str, cfg: AppConfig, db: KestrelDB) -> dict[str, Any]:
     log.info("Stage 9: synthesis complete")
     timings["synthesise"] = time.time() - t0
 
+    # ── Stage 9.5: AusTender contracts ──────────────────────────────────────
+    austender_contracts = _load_austender_contracts(cfg)
+
     # ── Stage 10: render ─────────────────────────────────────────────────────
     t0 = time.time()
     subject = make_subject(slot, started_at, cfg.timezone)
@@ -530,6 +533,7 @@ def run(slot: str, cfg: AppConfig, db: KestrelDB) -> dict[str, Any]:
         watchpoints=watchpoints_bullets,
         digest_md=digest_md,
         subject=subject,
+        austender_contracts=austender_contracts,
     )
     html_content = render_html(brief, cfg.paths.assets_dir, cfg.brief.theme, cfg.project_root)
     txt_content = render_text(brief)
@@ -630,6 +634,130 @@ def _check_zero_yield(zero_yield: list[str], slot: str, db: KestrelDB,
         if streak >= 2:
             needs.append(src_name)
     return needs
+
+
+def _short_description(title: str) -> str:
+    """Extract up to 10 words from a contract title as a terse description."""
+    words = title.split()
+    truncated = " ".join(words[:10])
+    return truncated if len(words) <= 10 else truncated + "…"
+
+
+def _agency_matches_filter(agency: str, filter_names: list[str]) -> bool:
+    """Return True if the agency name contains any filter term (case-insensitive)."""
+    agency_lower = agency.lower()
+    return any(f.lower() in agency_lower for f in filter_names)
+
+
+def _load_austender_contracts(cfg: AppConfig, max_age_hours: int = 168) -> list:
+    """Load the most recent AusTender scan from cache, or run a fresh scan.
+
+    Cache file: data/austender_cache.json
+    Re-scans if the cache is older than max_age_hours (default 7 days).
+    Filters to Defence-related agencies from the AusTender_Agencies sheet.
+    Returns list[AusTenderContract] sorted by value desc, capped at 10.
+    """
+    agency_filter = [a["name"] for a in cfg.austender_agencies]
+    cache_path = cfg.paths.data_dir / "austender_cache.json"
+
+    # Try to load from cache — filter is applied at load time so stale agency
+    # lists still work correctly against a fresh cache.
+    if cache_path.exists():
+        try:
+            raw = json.loads(cache_path.read_text(encoding="utf-8"))
+            age_hours = (
+                datetime.now(timezone.utc)
+                - datetime.fromisoformat(raw["scanned_at"]).replace(tzinfo=timezone.utc)
+            ).total_seconds() / 3600
+            if age_hours <= max_age_hours:
+                log.info("AusTender: using cached scan (%.1f h old)", age_hours)
+                all_cached = [AusTenderContract(**c) for c in raw["contracts"]]
+                if agency_filter:
+                    filtered = [
+                        c for c in all_cached
+                        if _agency_matches_filter(c.agency, agency_filter)
+                    ]
+                    log.info(
+                        "AusTender: %d/%d contracts match agency filter",
+                        len(filtered), len(all_cached),
+                    )
+                    return sorted(filtered, key=lambda c: c.value, reverse=True)[:10]
+                return sorted(all_cached, key=lambda c: c.value, reverse=True)[:10]
+            else:
+                log.info("AusTender: cache stale (%.1f h) — rescanning", age_hours)
+        except Exception as exc:
+            log.warning("AusTender: cache read error (%s) — rescanning", exc)
+
+    # Run a fresh scan (past 7 days)
+    try:
+        from kestrel.collectors.austender import AusTenderCollector
+        dummy_source = Source(
+            name="AusTender", type="AUSTENDER", sector="Government",
+            adjacent_domain="", active=True, url="https://www.tenders.gov.au",
+            linkedin_url="", asx_ticker="", primary_or_secondary="primary",
+            official_status="official", trust_score=5.0, signal_score=5.0,
+            noise_score=1.0, priority_tier=1, include_morning=True,
+            include_afternoon=True, notes="",
+        )
+        end = datetime.now(timezone.utc)
+        start = end - timedelta(days=7)
+        window = Window(start=start, end=end)
+        raw_items = AusTenderCollector(
+            timeout=60, min_value=cfg.filters.austender_min_award_value
+        ).collect(dummy_source, window)
+
+        # Cache ALL results (pre-filter) so agency list changes don't require a rescan
+        all_items = sorted(
+            [i for i in raw_items if i.raw_meta.get("value")],
+            key=lambda i: i.raw_meta["value"],
+            reverse=True,
+        )
+        all_contract_objs = [
+            AusTenderContract(
+                cn_id=i.raw_meta.get("cn_id", ""),
+                title=i.title,
+                url=i.url,
+                agency=i.raw_meta.get("agency", ""),
+                supplier=i.raw_meta.get("supplier", ""),
+                value=i.raw_meta["value"],
+                description=_short_description(i.title),
+            )
+            for i in all_items
+        ]
+
+        cache_path.write_text(
+            json.dumps({
+                "scanned_at": datetime.now(timezone.utc).isoformat(),
+                "contracts": [
+                    {
+                        "cn_id": c.cn_id, "title": c.title, "url": c.url,
+                        "agency": c.agency, "supplier": c.supplier,
+                        "value": c.value, "description": c.description,
+                    }
+                    for c in all_contract_objs
+                ],
+            }, indent=2),
+            encoding="utf-8",
+        )
+        log.info(
+            "AusTender: scanned %d contracts, cached to %s",
+            len(all_contract_objs), cache_path,
+        )
+
+        # Now apply agency filter for display
+        if agency_filter:
+            filtered = [
+                c for c in all_contract_objs
+                if _agency_matches_filter(c.agency, agency_filter)
+            ]
+        else:
+            filtered = all_contract_objs
+
+        return sorted(filtered, key=lambda c: c.value, reverse=True)[:10]
+
+    except Exception as exc:
+        log.warning("AusTender: scan failed — %s", exc)
+        return []
 
 
 def _print_summary(run_json: dict, html_path: Path,

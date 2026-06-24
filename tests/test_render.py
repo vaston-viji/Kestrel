@@ -25,8 +25,8 @@ def _make_scored(title: str = "Test headline") -> ScoredItem:
         published_at=datetime.now(tz=timezone.utc),
         snippet="A test snippet about Australian defence.",
         classification=Classification(
-            kpmg_tags=["Strategy"], domain_tags=["AUKUS"],
-            impact_score=4.0, kpmg_sentiment=0.5, primary_section="policy",
+            kestrel_tags=["Strategy"], domain_tags=["AUKUS"],
+            impact_score=4.0, kestrel_sentiment=0.5, primary_section="policy",
         ),
         rating_total=4.2, rating_impact=1.6, rating_sentiment=0.1,
         trust_score=5.0, signal_score=5.0, escalated=False, confidence="high",
@@ -40,7 +40,7 @@ def _make_brief(is_late: bool = False) -> Brief:
         narrative=ItemNarrative(
             what_happened="Defence confirmed new program.",
             why_it_matters="[[PASTE FROM CLAUDE]]",
-            kpmg_angle="[[PASTE FROM CLAUDE]]",
+            kestrel_angle="[[PASTE FROM CLAUDE]]",
         ),
         section="priority",
     )
