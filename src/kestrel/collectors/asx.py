@@ -15,7 +15,7 @@ from kestrel.models import RawItem, Source, Window
 
 log = logging.getLogger(__name__)
 
-UA = "Kestrel/1.0 (Australian Defence Brief; contact viji.john@quantrim.com)"
+UA = "Kestrel/1.0 (Australian Defence Brief; contact product@quantrim.com)"
 HEADERS = {"User-Agent": UA, "Accept": "application/json, text/html"}
 
 # ASX's internal JSON endpoint — NOTE: this API was shut down by ASX when they

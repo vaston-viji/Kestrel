@@ -62,8 +62,8 @@ def _load_brief_from_db(db: KestrelDB, slot: str, output_dir: Path) -> tuple[Bri
 
     items_rows = conn.execute(
         "SELECT item_id, headline, canonical_url, source_name, published_at, section, "
-        "summary, why_it_matters, kpmg_angle, confidence, rating_total, rating_impact, "
-        "rating_sentiment, kpmg_tags, domain_tags, escalated "
+        "summary, why_it_matters, quantrim_angle, confidence, rating_total, rating_impact, "
+        "rating_sentiment, quantrim_tags, domain_tags, escalated "
         "FROM items WHERE run_id=?",
         (run_id,),
     ).fetchall()

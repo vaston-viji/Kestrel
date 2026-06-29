@@ -36,7 +36,7 @@ Use the colour swatches as the master palette.
 - Set the wordmark in **Graphite**.
 - Use the sub-heading exactly as: **D&DI market scan**
 
-## Logo direction for **KPMG concept lock-up**
+## Logo direction for **Quantrim concept lock-up**
 - This is a concept expression only, not a replacement for the official masterbrand.
 - Retain the recognisable box motif in a simplified form.
 - Use **Graphite** for the wordmark and structure.

@@ -4,7 +4,7 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
-USER_AGENT = "Kestrel/1.0 (Australian Defence Brief; contact viji.john@quantrim.com)"
+USER_AGENT = "Kestrel/1.0 (Australian Defence Brief; contact product@quantrim.com)"
 
 COMPANIES = [
     {

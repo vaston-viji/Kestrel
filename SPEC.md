@@ -15,7 +15,7 @@ note.
 Kestrel is a **local, scheduled Python application** that runs twice each working day
 (07:00 and 11:30 Australia/Sydney), collects Australian Defence news from a maintained
 source registry, ranks and de-duplicates items, uses a language model to write the
-judgement layer (executive summary, "why it matters", KPMG angle, watchpoints), and
+judgement layer (executive summary, "why it matters", Quantrim angle, watchpoints), and
 renders a **self-contained HTML email plus a plain-text version** into a dated output
 folder for a **human to review and send**. v1 does not send email itself. It is designed
 so a later v2 can move to a server with automated sending and an API-driven model.
@@ -63,7 +63,7 @@ kestrel/
       priority_item.md          # prompt template: per priority-development item
       watchpoints.md            # prompt template: watchpoints
       classify.md               # prompt template: category + domain tagging + rating
-  assets/                       # brand pack (copied from kestrel_brand_pack_v1.zip) + KPMG_logo.png
+  assets/                       # brand pack (copied from kestrel_brand_pack_v1.zip) + Quantrim_logo.png
   data/
     kestrel_config.xlsx         # MASTER human-editable config (categories, quotes, filters, style, escalation)
     australian_defence_source_universe.xlsx   # MASTER source registry (provided)
@@ -113,12 +113,12 @@ testable function. The pipeline records timing and item counts per stage into `*
    keeping the highest-trust canonical link and recording the others as corroborating sources.
 6. **Validate** — run the source-validation framework (§10) on any item whose lead source is
    not `Official`. Attach a confidence level.
-7. **Classify + rate** — assign KPMG-capability tags and Defence-domain tags (§11), and compute
+7. **Classify + rate** — assign Quantrim-capability tags and Defence-domain tags (§11), and compute
    the rating (§12). This stage may call the model (classify prompt) or use rules; default is
    model-assisted with a deterministic fallback.
 8. **Select + allocate** — choose items per email section against the section caps (§8.4),
    enforcing MECE across sections. Apply escalation thresholds (§9.3).
-9. **Synthesise** — generate Top Line, per-item "why it matters" + KPMG angle, and Watchpoints
+9. **Synthesise** — generate Top Line, per-item "why it matters" + Quantrim angle, and Watchpoints
    via the synthesiser (§7). Pick the Quote of the Day (§8.3).
 10. **Render** — build the self-contained HTML and the plain-text version (§8).
 11. **Persist** — write outputs to `output/YYYY-MM-DD/`, append all selected items to the SQLite
@@ -158,7 +158,7 @@ brief:
 One workbook, one concern per sheet. The app reads this every run and treats it as
 authoritative. Required sheets and columns:
 
-- **Categories_KPMG** — `Tag`, `Description`, `Active`. KPMG capability tags
+- **Categories_Quantrim** — `Tag`, `Description`, `Active`. Quantrim capability tags
   (e.g. Workforce, Estate, Operating Model, Customer & Operations, Cyber, Strategy, Deals, Assurance).
 - **Categories_Domain** — `Tag`, `Description`, `Active`. Defence domains
   (e.g. Maritime, Land, Air, Space, Cyber, GWEO, Counter-drone, AUKUS, Critical Minerals).
@@ -169,7 +169,7 @@ authoritative. Required sheets and columns:
   (AUKUS, GWEO, counter-drone, force posture, northern basing, Indo-Pacific). See §9.3.
 - **Writing_Style** — `Rule_Group`, `Rule`, `Active`. Source of truth for tone rules;
   the app concatenates active rows into `config/writing_style.md` at runtime.
-- **Audience** — `Key`, `Value`. e.g. `audience = KPMG Partners`, `top_line_max_words = 150`.
+- **Audience** — `Key`, `Value`. e.g. `audience = Quantrim Partners`, `top_line_max_words = 150`.
 
 > The app must **fail with a precise message** (sheet + column) if the workbook is missing a
 > required sheet/column, rather than guessing.
@@ -260,12 +260,12 @@ CREATE TABLE items (
   section          TEXT,                 -- which email section it landed in
   summary          TEXT,
   why_it_matters   TEXT,
-  kpmg_angle       TEXT,
+  quantrim_angle       TEXT,
   confidence       TEXT,                 -- 'high' | 'medium' | 'low'
   rating_total     REAL,
   rating_impact    REAL,
-  rating_sentiment REAL,                 -- KPMG sentiment, signed
-  kpmg_tags        TEXT,                 -- json array
+  rating_sentiment REAL,                 -- Quantrim sentiment, signed
+  quantrim_tags        TEXT,                 -- json array
   domain_tags      TEXT,                 -- json array
   escalated        INTEGER NOT NULL DEFAULT 0,
   created_at       TEXT NOT NULL
@@ -301,7 +301,7 @@ behind one interface so the backing model can change without touching the pipeli
 ```python
 class Synthesizer(Protocol):
     def top_line(self, items: list[ScoredItem], style: str, max_words: int) -> list[str]: ...
-    def enrich_item(self, item: ScoredItem, style: str) -> ItemNarrative: ...   # why_it_matters + kpmg_angle
+    def enrich_item(self, item: ScoredItem, style: str) -> ItemNarrative: ...   # why_it_matters + quantrim_angle
     def watchpoints(self, items: list[ScoredItem], style: str) -> list[str]: ...
     def classify(self, item: RawItem, taxonomy: Taxonomy) -> Classification: ... # tags + rating inputs
 ```
@@ -314,18 +314,18 @@ class Synthesizer(Protocol):
   specified per prompt), and the code must parse defensively.
 - **FallbackSynthesizer**. No model calls. Produces a **structured digest** (`output/.../
   kestrel_<slot>_<date>.digest.md`) containing all selected, deduped, rated items with their
-  metadata, and writes the HTML with placeholder Top Line/KPMG-angle blocks clearly marked
+  metadata, and writes the HTML with placeholder Top Line/Quantrim-angle blocks clearly marked
   `[[PASTE FROM CLAUDE]]`. This guarantees a working pipeline before the API key is approved.
 
 > **Blocking prerequisite for full automation:** a working `ANTHROPIC_API_KEY` (or an approved
-> KPMG-hosted model endpoint). Until then the app runs in `provider: fallback` mode. Document
+> Quantrim-hosted model endpoint). Until then the app runs in `provider: fallback` mode. Document
 > this prominently in README and the runbook.
 
 ### 7.3 Editorial constraints the prompts must enforce
 - Australian English. Sharp, direct. Lead with the answer.
 - No em dashes. No "not X, but Y" contrast pivots. No stacked synonyms. No consulting fluff.
 - Top Line ≤ 150 words, 3–5 bullets, **bold** company / Service / capability names.
-- Every priority item must answer: what happened, why it matters, **KPMG angle**, what to watch.
+- Every priority item must answer: what happened, why it matters, **Quantrim angle**, what to watch.
 - The model must not invent figures, contract values, dates or attributions. If a fact is not
   in the source snippet, it must not appear. Unverified non-official items carry their
   confidence level through to render.
@@ -355,7 +355,7 @@ class Synthesizer(Protocol):
    important block.
 3. **Quote of the Day** — random active row from `Quotes`, centred and italicised, with author.
 4. **Priority developments** — 4–7 items. Each: Headline / What happened / Why it matters /
-   KPMG angle. This is the core section.
+   Quantrim angle. This is the core section.
 5. **Main body** — three MECE subsections, each a ranked bullet list (bold key entity + outcome,
    trailing `(Source)` link). Cap **10 per subsection**, hard cap **15 headlines total** across
    the body, ordered by rating. Fewer is better; do not pad.
@@ -365,8 +365,8 @@ class Synthesizer(Protocol):
 6. **Watchpoints** — 3–5 synthesised, forward-looking judgement bullets.
 7. **Footnote** — verbatim:
    *"This email was created by AI. Errors & Omissions Expected."* then
-   *"For feedback to this email please email Viji John <vjohn1@kpmg.com.au>"* then the
-   unsubscribe link (§8.6). Small, centred **KPMG logo** below the footnote.
+   *"For feedback to this email please email the Quantrim team <product@quantrim.com>"* then the
+   unsubscribe link (§8.6). Small, centred **Quantrim logo** below the footnote.
 
 ### 8.4 Section caps (read from `Filters`, with these defaults)
 - `max_priority_items = 7` (min 4)
@@ -380,8 +380,8 @@ ties broken by domain tag. The Priority developments section may re-feature a bo
 its significance clearly warrants top billing; if so, it is not double-counted in the body cap.
 
 ### 8.6 Unsubscribe
-A `mailto:` link: `mailto:vjohn1@kpmg.com.au?subject=Kestrel%20Unsubscribe&body=...`
-prefilled with the recipient line for Viji to action manually. No backend needed in v1.
+A `mailto:` link: `mailto:product@quantrim.com?subject=Kestrel%20Unsubscribe&body=...`
+prefilled with the recipient line for the Quantrim team to action manually. No backend needed in v1.
 
 ### 8.7 Brand
 Follow `kestrel_brand_design_note.md`: Graphite `#4E4E51` text/structure, Violet `#7766EC`
@@ -437,13 +437,13 @@ Map to `confidence ∈ {high, medium, low}`. Rules:
 ## 11. Categorisation (§ "Categorisation")
 
 Two independent tag sets, both drawn from `kestrel_config.xlsx`:
-- **KPMG capability tags** (Categories_KPMG): Workforce, Estate, Operating Model,
+- **Quantrim capability tags** (Categories_Quantrim): Workforce, Estate, Operating Model,
   Customer & Operations, Cyber, Strategy, Deals, Assurance, etc.
 - **Defence domain tags** (Categories_Domain): Maritime, Land, Air, Space, Cyber, GWEO,
   Counter-drone, AUKUS, Critical Minerals, etc.
 
 The classifier (model-assisted, deterministic fallback by keyword) assigns 0..n of each to every
-item. Tags drive MECE subsection allocation, the KPMG angle, and future scoring analytics. Tags
+item. Tags drive MECE subsection allocation, the Quantrim angle, and future scoring analytics. Tags
 are stored on the item in SQLite as JSON arrays.
 
 ---
@@ -457,12 +457,12 @@ rating_total = w_impact * impact_score
              + w_signal * source_signal_score      (from registry, 1-5)
              + w_trust  * source_trust_score        (from registry, 1-5)
              + escalation_boost                     (if escalated)
-             + w_sentiment * kpmg_sentiment         (signed: positive opportunity vs negative risk)
+             + w_sentiment * quantrim_sentiment         (signed: positive opportunity vs negative risk)
 ```
 
 - `impact_score` (1–5): impact on the sector / Australian operating environment, from the
   classifier.
-- `kpmg_sentiment` (signed, e.g. -2..+2): is this good or bad for KPMG / its clients
+- `quantrim_sentiment` (signed, e.g. -2..+2): is this good or bad for Quantrim / its clients
   (opportunity vs risk). Both magnitudes matter; a large negative is still highly newsworthy.
 - Weights live in the `Filters` sheet so they are tunable without code changes. Provide sensible
   defaults (e.g. impact 0.4, signal 0.2, trust 0.2, sentiment 0.2, escalation_boost +1.0).
@@ -502,9 +502,9 @@ rating_total = w_impact * impact_score
    and a `*.run.json`; and appends rows to `kestrel.db`.
 2. With a valid `ANTHROPIC_API_KEY` and `provider: anthropic`, the same command produces a brief
    with a real Top Line (≤150 words, 3–5 bullets, bolded entities), 4–7 priority items each with a
-   KPMG angle, three MECE body subsections respecting caps, a quote, and 3–5 watchpoints.
+   Quantrim angle, three MECE body subsections respecting caps, a quote, and 3–5 watchpoints.
 3. Editing `kestrel_config.xlsx` (e.g. adding a quote, changing `max_priority_items`, adding a
-   KPMG tag, editing a writing-style rule) changes the next run with **no code edits**.
+   Quantrim tag, editing a writing-style rule) changes the next run with **no code edits**.
 4. Setting a source to `Active = No` removes it from collection; slot flags route sources to the
    right run.
 5. The same story from two sources appears once, with the higher-trust canonical link and the
@@ -514,7 +514,7 @@ rating_total = w_impact * impact_score
 7. A deliberately broken source (bad URL/selector) is logged as `needs_attention` and the run
    still completes.
 8. Brand: correct palette, header asset for the configured theme, verbatim subheading and
-   footnote, centred KPMG logo, unsubscribe `mailto:` to Viji.
+   footnote, centred Quantrim logo, unsubscribe `mailto:` to product@quantrim.com.
 9. A simulated missed slot generates late and the header shows the late marker.
 10. `tests/` pass, including dedupe, rating order, MECE allocation, config validation and
     fallback rendering.
@@ -523,7 +523,7 @@ rating_total = w_impact * impact_score
 
 ## 16. v2 design hooks (build seams, do not implement)
 
-- Swap `FallbackSynthesizer`/`AnthropicSynthesizer` for a KPMG-hosted endpoint behind the same
+- Swap `FallbackSynthesizer`/`AnthropicSynthesizer` for a Quantrim-hosted endpoint behind the same
   interface.
 - Replace the human-send step with a `Sender` interface (Graph API / SMTP) reading
   `subscribers.xlsx` and `Subscription Preference`.

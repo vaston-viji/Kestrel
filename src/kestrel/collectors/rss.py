@@ -17,7 +17,7 @@ _FEED_NOT_MODIFIED = b""  # sentinel: feed bytes indicating nothing changed
 
 FEED_PATHS = ["/feed", "/rss", "/feed.xml", "/rss.xml", "/atom.xml",
               "/news.xml", "/news/feed", "/feed/rss", "/blog/feed"]
-HEADERS = {"User-Agent": "Kestrel/1.0 (Australian Defence Brief; contact viji.john@quantrim.com)"}
+HEADERS = {"User-Agent": "Kestrel/1.0 (Australian Defence Brief; contact product@quantrim.com)"}
 
 
 def _fetch_feed_bytes(url: str, timeout: int) -> bytes | None:

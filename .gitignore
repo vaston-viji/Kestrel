@@ -8,5 +8,5 @@ data/kestrel.db
 data/kestrel.db-wal
 data/kestrel.db-shm
 output/
-config/kpmg_ca_bundle.pem
+config/quantrim_ca_bundle.pem
 .bootstrap/

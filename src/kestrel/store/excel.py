@@ -120,14 +120,14 @@ def read_sources(path: Path) -> list[dict]:
 # ---------------------------------------------------------------------------
 
 def read_kestrel_config(path: Path) -> dict:
-    """Return dict with keys: kpmg_tags, domain_tags, quotes, filters, escalation,
+    """Return dict with keys: quantrim_tags, domain_tags, quotes, filters, escalation,
     writing_style_rules, audience."""
     wb = _load(path)
     result = {}
 
-    # Categories_KPMG
-    ws = _sheet(wb, "Categories_KPMG", path)
-    rows = _rows_as_dicts(ws, ["Tag", "Description", "Active"], path, "Categories_KPMG")
+    # Categories_Quantrim
+    ws = _sheet(wb, "Categories_Quantrim", path)
+    rows = _rows_as_dicts(ws, ["Tag", "Description", "Active"], path, "Categories_Quantrim")
     result["kestrel_tags"] = [
         {"tag": _str(r["tag"]), "description": _str(r["description"])}
         for r in rows if _bool_yes(r.get("active"))

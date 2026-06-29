@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 
 def _build_ssl_context(project_root: Path) -> ssl.SSLContext | None:
     """Return an SSLContext that trusts a corporate CA bundle, or None to use certifi default."""
-    ca_bundle = project_root / "config" / "kpmg_ca_bundle.pem"
+    ca_bundle = project_root / "config" / "quantrim_ca_bundle.pem"
     if not ca_bundle.exists():
         return None
     ctx = ssl.create_default_context(cafile=str(ca_bundle))

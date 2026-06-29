@@ -34,12 +34,12 @@ CREATE TABLE IF NOT EXISTS items (
     section          TEXT,
     summary          TEXT,
     why_it_matters   TEXT,
-    kpmg_angle       TEXT,
+    quantrim_angle       TEXT,
     confidence       TEXT,
     rating_total     REAL,
     rating_impact    REAL,
     rating_sentiment REAL,
-    kpmg_tags        TEXT,
+    quantrim_tags        TEXT,
     domain_tags      TEXT,
     escalated        INTEGER NOT NULL DEFAULT 0,
     created_at       TEXT NOT NULL
@@ -123,9 +123,9 @@ class KestrelDB:
             self._conn.execute(
                 """INSERT OR REPLACE INTO items
                    (item_id, run_id, headline, canonical_url, source_name,
-                    published_at, section, summary, why_it_matters, kpmg_angle,
+                    published_at, section, summary, why_it_matters, quantrim_angle,
                     confidence, rating_total, rating_impact, rating_sentiment,
-                    kpmg_tags, domain_tags, escalated, created_at)
+                    quantrim_tags, domain_tags, escalated, created_at)
                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
                 (
                     si.item_id, run_id, si.title, si.canonical_url, si.source_name,

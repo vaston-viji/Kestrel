@@ -37,7 +37,7 @@ def test_missing_sheet_raises_clear_error(tmp_path: Path):
 
     # Build a partial config workbook missing Categories_Domain
     wb2 = _make_workbook({
-        "Categories_KPMG": [["Tag", "Description", "Active"], ["Cyber", "desc", "Yes"]],
+        "Categories_Quantrim": [["Tag", "Description", "Active"], ["Cyber", "desc", "Yes"]],
         # Categories_Domain MISSING
         "Quotes": [["Quote", "Author", "Active"]],
         "Filters": [["Key", "Value", "Notes"]],
