@@ -96,6 +96,9 @@ class GoogleNewsCollector:
                 continue
 
             snippet = re.sub(r"<[^>]+>", " ", entry.get("summary", "")).strip()[:500]
+            # Capture the publisher homepage URL so article_fetcher can locate
+            # the article on the source site when the GNews redirect is opaque.
+            gnews_source_href = entry.get("source", {}).get("href", "")
 
             items.append(RawItem(
                 title=title,
@@ -103,7 +106,7 @@ class GoogleNewsCollector:
                 source_name=source.name,
                 published_at=pub,
                 snippet=snippet,
-                raw_meta={"gnews_query": query},
+                raw_meta={"gnews_query": query, "gnews_source_href": gnews_source_href},
             ))
 
         log.info("GoogleNews %s (q=%r) -> %d items", source.name, query, len(items))

@@ -136,6 +136,15 @@ def _dedupe(items: list[RawItem], threshold: float,
         others = [i for i in group if i is not best]
         corroborating = [(o.source_name, _normalise_url(o.url)) for o in others]
 
+        # If the canonical item has a headline-only snippet, take the richest
+        # snippet from any group member — often a direct-scrape source has body text
+        # even when the best canonical came from Google News RSS.
+        snippet = best.snippet or ""
+        if len(snippet) < len(best.title) + 30:
+            richer = max(group, key=lambda i: len(i.snippet or ""))
+            if len(richer.snippet or "") > len(snippet):
+                snippet = richer.snippet or ""
+
         # Stub item_id — will be enriched later
         deduped.append(ScoredItem(
             item_id=str(uuid.uuid4()),
@@ -143,7 +152,7 @@ def _dedupe(items: list[RawItem], threshold: float,
             canonical_url=_normalise_url(best.url),
             source_name=best.source_name,
             published_at=best.published_at,
-            snippet=best.snippet,
+            snippet=snippet,
             classification=Classification([], [], 2.0, 0.0, "policy"),
             rating_total=0.0,
             rating_impact=0.0,
@@ -471,6 +480,16 @@ def run(slot: str, cfg: AppConfig, db: KestrelDB) -> dict[str, Any]:
 
     all_selected = priority_scored + policy_scored + market_scored + tech_scored
 
+    # ── Stage 8.5: enrich thin snippets on priority items ───────────────────
+    # Fetches article body text for items whose snippet is just the headline
+    # (common for Google News RSS). Resolves GNews redirect URLs to real article
+    # URLs in the same request so brief links point directly to the source.
+    t0 = time.time()
+    from kestrel.collectors.article_fetcher import enrich_snippets
+    enrich_snippets(priority_scored, timeout=cfg.run.per_source_timeout_seconds)
+    log.info("Stage 8.5: snippet enrichment complete")
+    timings["enrich_snippets"] = time.time() - t0
+
     # ── Stage 9: synthesise ──────────────────────────────────────────────────
     t0 = time.time()
     top_line = synth.top_line(priority_scored + policy_scored, style,
@@ -649,15 +668,21 @@ def _agency_matches_filter(agency: str, filter_names: list[str]) -> bool:
     return any(f.lower() in agency_lower for f in filter_names)
 
 
-def _load_austender_contracts(cfg: AppConfig, max_age_hours: int = 168) -> list:
+_AUSTENDER_AGENCY_EXCLUDE = {"australian criminal intelligence"}
+
+
+def _load_austender_contracts(cfg: AppConfig, max_age_hours: int = 23) -> list:
     """Load the most recent AusTender scan from cache, or run a fresh scan.
 
     Cache file: data/austender_cache.json
-    Re-scans if the cache is older than max_age_hours (default 7 days).
+    Re-scans if the cache is older than max_age_hours (default 23 hours).
     Filters to Defence-related agencies from the AusTender_Agencies sheet.
     Returns list[AusTenderContract] sorted by value desc, capped at 10.
     """
-    agency_filter = [a["name"] for a in cfg.austender_agencies]
+    agency_filter = [
+        a["name"] for a in cfg.austender_agencies
+        if a["name"].lower() not in _AUSTENDER_AGENCY_EXCLUDE
+    ]
     cache_path = cfg.paths.data_dir / "austender_cache.json"
 
     # Try to load from cache — filter is applied at load time so stale agency

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unsubscribe — Kestrel</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/png" href="/static/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<main class="unsub-page" role="main">
+
+  <a href="/" aria-label="Back to Kestrel home">
+    <img src="/static/logo-light.png" class="unsub-logo" alt="Kestrel">
+  </a>
+
+  <div class="unsub-card">
+
+    <!-- Form state -->
+    <div class="unsub-card-body">
+      <div class="unsub-icon" aria-hidden="true">&#128231;</div>
+      <h1>Unsubscribe from Kestrel</h1>
+      <p>Enter the email address you subscribed with and we'll remove you from the daily brief immediately.</p>
+
+      <form class="unsub-form unsubscribe-form" novalidate>
+        <input
+          type="email"
+          name="email"
+          id="unsub-email"
+          placeholder="Your email address"
+          required
+          autocomplete="email"
+        >
+        <button type="submit" class="btn-danger">Confirm unsubscribe</button>
+        <div class="form-status" role="status" aria-live="polite"></div>
+        <a href="/" class="btn-ghost">Keep receiving Kestrel</a>
+      </form>
+    </div>
+
+    <!-- Success state (shown by JS) -->
+    <div class="unsub-done" role="status">
+      <div class="unsub-done-icon" aria-hidden="true">&#10003;</div>
+      <h2>You've been unsubscribed</h2>
+      <p>We've removed you from the daily brief. You won't receive any further emails.</p>
+      <p>Changed your mind? <a href="/#subscribe" style="color:var(--violet);font-weight:600;text-decoration:none;">Re-subscribe here.</a></p>
+    </div>
+
+  </div>
+
+</main>
+
+<script src="/static/script.js"></script>
+</body>
+</html>

@@ -13,6 +13,12 @@ Rules:
   delivery challenge, workforce or supply-chain pressure, cyber or assurance risk, or
   transformation opportunity. This line is the value-add. One or two tight sentences.
 - Each value is one or two tight sentences.
+- INSUFFICIENT SOURCE DETAIL GUARD: If the snippet contains only a headline with no
+  supporting facts (no milestone detail, no named parties, no work performed, no value or
+  date beyond what is in the headline itself), set "what_happened" to exactly:
+  "INSUFFICIENT SOURCE DETAIL — only a headline was available. Open the source URL to
+  complete this entry before sending." Leave "why_it_matters" and "kestrel_angle" as
+  empty strings. Do not invent or infer content.
 
 Item:
 {{ITEM}}

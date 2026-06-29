@@ -1,0 +1,35 @@
+# Systemd service for the Kestrel website server
+# Deploy to: /etc/systemd/system/kestrel-web.service
+# Enable:    sudo systemctl enable kestrel-web
+# Start:     sudo systemctl start kestrel-web
+# Status:    sudo systemctl status kestrel-web
+# Logs:      sudo journalctl -u kestrel-web -f
+
+[Unit]
+Description=Kestrel Website (FastAPI / uvicorn)
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=kestrel
+WorkingDirectory=/opt/kestrel
+ExecStart=/opt/kestrel/.venv/bin/uvicorn website.server:app \
+    --host 127.0.0.1 \
+    --port 8080 \
+    --workers 2 \
+    --access-log \
+    --log-level info
+Restart=on-failure
+RestartSec=5s
+StandardOutput=journal
+StandardError=journal
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/opt/kestrel/data
+
+[Install]
+WantedBy=multi-user.target
