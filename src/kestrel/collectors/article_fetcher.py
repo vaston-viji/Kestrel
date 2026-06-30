@@ -34,7 +34,7 @@ _MAX_SNIPPET_CHARS = 600
 _MIN_PARA_CHARS = 40        # shorter paragraphs are nav/label noise
 _TITLE_MATCH_THRESHOLD = 75  # rapidfuzz token_set_ratio score to accept as same article
 
-_UA = "Kestrel/1.0 (Australian Defence Brief; contact viji.john@quantrim.com)"
+_UA = "Kestrel/1.0 (Australian Defence Brief; contact product@quantrim.com)"
 _HEADERS = {
     "User-Agent": _UA,
     "Accept": "text/html,application/xhtml+xml,*/*",
