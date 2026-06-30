@@ -37,7 +37,8 @@ class RunConfig:
 @dataclass
 class SynthesisConfig:
     provider: str       # 'anthropic' | 'fallback'
-    model: str
+    model: str          # Sonnet — enrich_item, top_line, watchpoints
+    classify_model: str # Haiku  — bulk per-item classification
     max_retries: int
 
 
@@ -189,6 +190,10 @@ def load_config(project_root: Path) -> AppConfig:
         synthesis=SynthesisConfig(
             provider=y["synthesis"].get("provider", "fallback"),
             model=y["synthesis"].get("model", "claude-sonnet-4-6"),
+            classify_model=y["synthesis"].get(
+                "classify_model",
+                y["synthesis"].get("model", "claude-sonnet-4-6"),
+            ),
             max_retries=y["synthesis"].get("max_retries", 3),
         ),
         brief=BriefConfig(theme=y["brief"].get("theme", "light")),

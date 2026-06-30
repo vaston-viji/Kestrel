@@ -56,7 +56,7 @@ def _extract_json(text: str) -> dict:
 
 
 class AnthropicSynthesizer:
-    def __init__(self, model: str, max_retries: int, project_root: Path) -> None:
+    def __init__(self, model: str, classify_model: str, max_retries: int, project_root: Path) -> None:
         import anthropic
         import httpx
 
@@ -69,6 +69,7 @@ class AnthropicSynthesizer:
             **({"http_client": http_client} if http_client is not None else {}),
         )
         self._model = model
+        self._classify_model = classify_model
         self._max_retries = max_retries
         self._root = project_root
         self._style = _load_style(project_root)
@@ -76,11 +77,13 @@ class AnthropicSynthesizer:
         # Prevents 39-min classify drain when a corporate proxy blocks api.anthropic.com.
         self._proxy_blocked = False
 
-    def _call(self, prompt: str, max_tokens: int = 1024) -> str:
+    def _call(self, prompt: str, max_tokens: int = 1024, model: str | None = None) -> str:
         import anthropic as _anthropic
 
         if self._proxy_blocked:
             raise RuntimeError("Anthropic API unreachable — skipping (proxy-blocked fast-fail)")
+
+        _model = model or self._model
 
         # Only retry on transient server-side errors. Connection errors are NOT retried here
         # because corporate proxy blocks are persistent — retrying wastes time with no benefit.
@@ -97,7 +100,7 @@ class AnthropicSynthesizer:
         )
         def _inner():
             resp = self._client.messages.create(
-                model=self._model,
+                model=_model,
                 max_tokens=max_tokens,
                 messages=[{"role": "user", "content": prompt}],
                 timeout=30.0,
@@ -120,7 +123,7 @@ class AnthropicSynthesizer:
                          .replace("{{DOMAIN_TAGS}}", str(taxonomy.domain_tags)) \
                          .replace("{{ITEM}}", _item_context(item))
         try:
-            raw = self._call(prompt, max_tokens=256)
+            raw = self._call(prompt, max_tokens=256, model=self._classify_model)
             data = _extract_json(raw)
             return Classification(
                 kestrel_tags=[t for t in data.get("kestrel_tags", []) if t in taxonomy.kestrel_tags],
@@ -182,7 +185,8 @@ class AnthropicSynthesizer:
             return FallbackSynthesizer().watchpoints(items, style)
 
 
-def make_synthesizer(provider: str, model: str, max_retries: int, project_root: Path):
+def make_synthesizer(provider: str, model: str, classify_model: str,
+                     max_retries: int, project_root: Path):
     """Factory — returns the correct Synthesizer implementation."""
     if provider == "anthropic":
         import os
@@ -190,6 +194,11 @@ def make_synthesizer(provider: str, model: str, max_retries: int, project_root: 
             log.warning("provider=anthropic but ANTHROPIC_API_KEY not set; using fallback")
             from kestrel.synthesis.fallback import FallbackSynthesizer
             return FallbackSynthesizer()
-        return AnthropicSynthesizer(model=model, max_retries=max_retries, project_root=project_root)
+        return AnthropicSynthesizer(
+            model=model,
+            classify_model=classify_model,
+            max_retries=max_retries,
+            project_root=project_root,
+        )
     from kestrel.synthesis.fallback import FallbackSynthesizer
     return FallbackSynthesizer()

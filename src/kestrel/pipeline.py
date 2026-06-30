@@ -387,6 +387,7 @@ def run(slot: str, cfg: AppConfig, db: KestrelDB) -> dict[str, Any]:
 
     synth = make_synthesizer(
         cfg.synthesis.provider, cfg.synthesis.model,
+        cfg.synthesis.classify_model,
         cfg.synthesis.max_retries, cfg.project_root,
     )
     style = _load_style(cfg)
