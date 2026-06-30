@@ -101,6 +101,7 @@ class AusTenderContract:
     supplier: str
     value: int                   # integer dollars
     description: str             # ≤10 word summary
+    contact_name: str = ""       # contact officer from contract notice
 
 
 @dataclass

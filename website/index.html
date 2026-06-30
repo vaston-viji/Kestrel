@@ -3,278 +3,188 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kestrel — Australian Defence Intelligence</title>
-  <meta name="description" content="Daily Australian Defence and sovereign industry intelligence for the professionals who can't afford to be second. Delivered once a day.">
-  <meta property="og:title" content="Kestrel — Australian Defence Intelligence">
-  <meta property="og:description" content="We scan fast, see early and surface what matters.">
+  <title>Kestrel — Australian Defence Intelligence Brief</title>
+  <meta name="description" content="Daily Australian Defence and sovereign industry intelligence for professionals who can't afford to be second. Subscribe to the Kestrel morning brief.">
+  <meta property="og:title" content="Kestrel — Australian Defence Intelligence Brief">
+  <meta property="og:description" content="Before your first meeting, read Kestrel.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://kestrel.quantrim.com">
   <link rel="icon" type="image/png" href="/static/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 
-<!-- ── Navigation ─────────────────────────────────────── -->
-<nav class="nav" role="navigation" aria-label="Main">
+<!-- Navigation -->
+<nav class="site-nav" role="navigation" aria-label="Main">
   <div class="container">
-    <div class="nav-inner">
-      <a href="/" class="nav-logo" aria-label="Kestrel home">
-        <img src="/static/logo-dark.png"  class="logo-dark"  alt="Kestrel">
-        <img src="/static/logo-light.png" class="logo-light" alt="Kestrel">
+    <div class="site-nav__inner">
+      <a href="/" class="site-nav__logo" aria-label="Kestrel home">
+        <img src="/static/logo-light.png" alt="Kestrel" height="30">
       </a>
-      <a href="#subscribe" class="nav-cta">Get the brief</a>
+      <a href="#subscribe" class="site-nav__cta">Subscribe</a>
     </div>
   </div>
 </nav>
 
-<!-- ── Hero ───────────────────────────────────────────── -->
-<section class="hero" aria-label="Introduction">
+<!-- Hero -->
+<section class="hero">
   <div class="container">
-    <div class="hero-inner">
-
-      <!-- Left: headline + form -->
-      <div class="hero-text">
-        <div class="hero-tag">
-          <span class="hero-tag-dot"></span>
-          Australian Defence &nbsp;·&nbsp; Intelligence
-        </div>
-        <h1>See early.<br><em>Act first.</em></h1>
-        <p class="hero-sub">
-          Daily intelligence for Australian Defence and sovereign industry professionals.
-          We scan 100+ sources so you don't have to.
-        </p>
-        <form class="hero-form subscribe-form" novalidate id="hero-form">
-          <div class="input-row">
-            <input type="text" name="name" placeholder="Name (optional)" autocomplete="name">
-            <input type="email" name="email" placeholder="Work email address" required autocomplete="email">
-          </div>
-          <button type="submit" class="btn-primary">Get the brief</button>
-          <p class="form-note">One brief, once a day. Unsubscribe at any time.</p>
-          <div class="form-status" role="status" aria-live="polite"></div>
-        </form>
+    <p class="hero__eyebrow">Australian Defence &nbsp;·&nbsp; Sovereign Industry &nbsp;·&nbsp; National Security</p>
+    <h1 class="hero__h1">Before your first meeting,<br>read Kestrel.</h1>
+    <p class="hero__sub">Daily intelligence covering Australian Defence and sovereign industry — priority developments ready each morning, structured for immediate use.</p>
+    <form class="hero__form subscribe-form" novalidate>
+      <div class="hero__form-row">
+        <input type="email" name="email" placeholder="Work email address" required autocomplete="email">
+        <button type="submit" class="btn-primary">Get the brief</button>
       </div>
-
-      <!-- Right: mock brief preview -->
-      <div class="hero-visual" aria-hidden="true">
-        <div class="brief-preview">
-          <div class="brief-preview-masthead">
-            <span class="brief-preview-title">Kestrel Morning Brief</span>
-            <span class="brief-preview-date">Mon 29 Jun 2026</span>
-          </div>
-
-          <div class="brief-item">
-            <div class="brief-item-tag">&#9650;&nbsp; Priority Development</div>
-            <div class="brief-item-headline">Hunter-class design authority transferred to Australian sovereign teams</div>
-            <div class="brief-item-body">BAE Systems confirmed the structural design review milestone, with engineering accountability now resting with Australian-based teams under the Capability Acquisition and Sustainment Group.</div>
-            <div class="brief-item-angle">
-              <strong>Advisory angle:</strong> CASG uplift demand will intensify — advisory teams should expect an accelerated workforce ask across systems engineering and programme assurance.
-            </div>
-          </div>
-
-          <div class="brief-item">
-            <div class="brief-item-tag">&#9650;&nbsp; Priority Development</div>
-            <div class="brief-item-headline">AUKUS Pillar II advanced capabilities acceleration confirmed for FY27</div>
-            <div class="brief-item-body">Defence released updated Pillar II project timelines covering autonomous systems, quantum and cyber capability tranches, with Australian industry participation requirements tightened.</div>
-            <div class="brief-item-angle">
-              <strong>Advisory angle:</strong> Sovereign industry partners face accelerated accreditation timelines — supply-chain and security assurance advisory will be a near-term pressure point.
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ── Stats bar ──────────────────────────────────────── -->
-<div class="stats">
-  <div class="container">
-    <div class="stats-inner">
-      <div class="reveal">
-        <div class="stat-value">100<em>+</em></div>
-        <div class="stat-label">Sources monitored daily</div>
-      </div>
-      <div class="reveal reveal-d1">
-        <div class="stat-value"><em>1</em></div>
-        <div class="stat-label">Brief per day, every day</div>
-      </div>
-      <div class="reveal reveal-d2">
-        <div class="stat-value">5–10</div>
-        <div class="stat-label">Priority items surfaced</div>
-      </div>
-      <div class="reveal reveal-d3">
-        <div class="stat-value"><em>0</em></div>
-        <div class="stat-label">Dashboards to log into</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ── What ───────────────────────────────────────────── -->
-<section id="what" aria-labelledby="what-heading">
-  <div class="container">
-    <div class="what-inner">
-
-      <div class="what-text reveal">
-        <span class="section-tag">What is Kestrel</span>
-        <h2 class="section-h2" id="what-heading">Curated defence intelligence, ready before your first meeting.</h2>
-        <p class="section-lead">Kestrel is an AI-augmented intelligence service that scans 100+ Australian Defence and national security sources daily. It distils hundreds of developments into a concise brief of 5–10 priority items — written in the format executives use, not the format algorithms produce.</p>
-        <div class="what-features">
-          <div class="what-feature">
-            <div class="what-feature-icon">&#128273;</div>
-            <div class="what-feature-text">
-              <h4>Signal, not noise</h4>
-              <p>Official Defence releases, procurement notices, parliamentary activity and industry announcements — ranked by significance, deduplicated, filtered to what requires attention.</p>
-            </div>
-          </div>
-          <div class="what-feature">
-            <div class="what-feature-icon">&#128221;</div>
-            <div class="what-feature-text">
-              <h4>Written for decision-makers</h4>
-              <p>Each item includes what happened, why it matters and the advisory or operational angle — two sentences each. No padding. No hedging.</p>
-            </div>
-          </div>
-          <div class="what-feature">
-            <div class="what-feature-icon">&#128241;</div>
-            <div class="what-feature-text">
-              <h4>In your inbox, once a day</h4>
-              <p>A single clear email each morning. No platforms to onboard, no feeds to manage, no notifications to dismiss.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="reveal reveal-d1">
-        <div class="sample-card">
-          <div class="sample-card-header">
-            <span class="sample-card-label">Sample brief item</span>
-            <span class="sample-card-slot">Morning Brief</span>
-          </div>
-          <div class="sample-item">
-            <div class="sample-item-tag">&#9650;&nbsp; Priority Development</div>
-            <div class="sample-item-headline">Australian Naval Group confirms $2.1B sustainment contract renewal for Collins-class submarine program</div>
-            <div class="sample-row-label">What happened</div>
-            <div class="sample-row-text">The Commonwealth executed a $2.1 billion sustainment contract renewal covering Collins-class submarine through-life support, extending the arrangement by eight years and locking in sovereign workforce provisions under the AUKUS workforce development framework.</div>
-            <div class="sample-row-label">Why it matters</div>
-            <div class="sample-row-text">The renewal secures the industrial baseline required to sustain optionally crewed capability development until the SSN pathway matures — reducing sovereign risk at a critical juncture.</div>
-            <div class="sample-angle-box">
-              <strong>Kestrel angle:</strong> Advisory firms embedded in CASG or Naval Group should anticipate programme assurance and workforce compliance advisory demand as the new contract terms are operationalised across the supply chain.
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ── Why ────────────────────────────────────────────── -->
-<section id="why" class="why" aria-labelledby="why-heading">
-  <div class="container">
-    <div class="why-header">
-      <div class="reveal">
-        <span class="section-tag">Why Kestrel</span>
-        <h2 class="section-h2" id="why-heading">The brief you needed.<br>Every morning.</h2>
-      </div>
-      <p class="section-lead reveal reveal-d1">Senior Defence professionals and sovereign industry leaders receive one brief that replaces hours of daily source monitoring.</p>
-    </div>
-    <div class="why-grid">
-      <div class="why-card reveal">
-        <div class="why-card-icon">&#127919;</div>
-        <h3>Signal without noise</h3>
-        <p>Kestrel processes hundreds of daily items — releases, tenders, parliamentary inquiries, industry announcements — and surfaces the 5–10 that demand attention. Everything else is filtered.</p>
-      </div>
-      <div class="why-card reveal reveal-d1">
-        <div class="why-card-icon">&#9889;</div>
-        <h3>Written for the first meeting</h3>
-        <p>Each item is structured for immediate utility: what happened, why it matters strategically, and the concrete implication for advisory, delivery or client engagement. Two sentences each.</p>
-      </div>
-      <div class="why-card reveal reveal-d2">
-        <div class="why-card-icon">&#128274;</div>
-        <h3>Built for the sector</h3>
-        <p>Coverage is drawn from the sources that matter — Defence Ministers, CASG, ASD, parliamentary committees, AusTender, ASX-listed primes and sovereign industry feeds. Not general news.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── How ────────────────────────────────────────────── -->
-<section id="how" aria-labelledby="how-heading">
-  <div class="container">
-    <div class="how-header reveal">
-      <span class="section-tag">How it works</span>
-      <h2 class="section-h2" id="how-heading">From raw signal to ready brief in four stages.</h2>
-      <p class="section-lead">A disciplined pipeline built for the Australian Defence context — not a generic news aggregator.</p>
-    </div>
-    <div class="how-steps">
-      <div class="how-connector" aria-hidden="true"></div>
-      <div class="how-step reveal">
-        <div class="how-step-num">1</div>
-        <h4>Collect</h4>
-        <p>Monitor 100+ official Defence sources, procurement channels, parliamentary feeds and industry registries — continuously, every day.</p>
-      </div>
-      <div class="how-step reveal reveal-d1">
-        <div class="how-step-num">2</div>
-        <h4>Classify</h4>
-        <p>AI-powered ranking surfaces priority developments from the day's noise. Duplicates removed. Source credibility weighted.</p>
-      </div>
-      <div class="how-step reveal reveal-d2">
-        <div class="how-step-num">3</div>
-        <h4>Synthesise</h4>
-        <p>Each item is written with professional judgement — not just summarised. What happened. Why it matters. The concrete angle for your work.</p>
-      </div>
-      <div class="how-step reveal reveal-d3">
-        <div class="how-step-num">4</div>
-        <h4>Deliver</h4>
-        <p>One clean brief, once a day, to your inbox. Human-reviewed before it reaches you. Ready to act on before your first meeting.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── CTA / Subscribe ─────────────────────────────────── -->
-<section id="subscribe" class="cta-section" aria-labelledby="cta-heading">
-  <div class="container">
-    <span class="section-tag">Get started</span>
-    <h2 class="section-h2" id="cta-heading">Start receiving Kestrel.</h2>
-    <p class="section-lead">Join Australian Defence and sovereign industry professionals who read Kestrel each morning.</p>
-    <form class="cta-form subscribe-form" novalidate id="cta-form">
-      <input type="text"  name="name"  placeholder="Name (optional)"    autocomplete="name">
-      <input type="email" name="email" placeholder="Work email address" required autocomplete="email">
-      <button type="submit" class="btn-primary">Get the brief</button>
-      <p class="form-note">Free. One email per day. Unsubscribe at any time.</p>
       <div class="form-status" role="status" aria-live="polite"></div>
     </form>
+    <p class="hero__note">Free. One email per day. Unsubscribe at any time.</p>
   </div>
 </section>
 
-<!-- ── Footer ─────────────────────────────────────────── -->
-<footer>
+<!-- Brief preview — the product is the pitch -->
+<section class="brief-demo" aria-label="Sample brief">
   <div class="container">
-    <div class="footer-inner">
-      <div class="footer-brand">
-        <img src="/static/logo-dark.png" alt="Kestrel">
-        <p class="footer-tagline">We scan fast, see early and surface what matters.</p>
+
+    <div class="brief-doc reveal">
+
+      <!-- Masthead -->
+      <div class="brief-doc__masthead">
+        <img src="/static/logo-light.png" alt="Kestrel" height="52">
       </div>
-      <div class="footer-col">
-        <h5>Product</h5>
-        <a href="#what">What is Kestrel</a>
-        <a href="#why">Why Kestrel</a>
-        <a href="#how">How it works</a>
-        <a href="#subscribe">Subscribe</a>
+
+      <!-- Disclaimer -->
+      <div class="brief-doc__disclaimer">
+        Sourced through an AI generated market scan where errors, omissions and hallucinations are expected. Reach out to help us improve the scan.
       </div>
-      <div class="footer-col">
-        <h5>Legal</h5>
-        <a href="/unsubscribe">Unsubscribe</a>
-        <a href="mailto:viji.john@quantrim.com">Contact</a>
+
+      <!-- Slot bar -->
+      <div class="brief-doc__slotbar">
+        <p class="brief-doc__tagline"><em>The developments that matter for Australian Defence, sovereign industry and national resilience.</em></p>
+        <p class="brief-doc__slot"><strong>Morning Brief</strong> &nbsp;&middot;&nbsp; Monday 30 June 2026</p>
+      </div>
+
+      <!-- Section header -->
+      <div class="brief-doc__section-hdr">
+        <span class="brief-doc__section-label">Priority Developments</span>
+      </div>
+
+      <!-- Item 01 -->
+      <div class="brief-doc__item">
+        <span class="brief-doc__item-num">01</span>
+        <div class="brief-doc__item-body">
+          <p class="brief-doc__headline">Hunter-class structural design authority transferred to Australian sovereign engineering teams</p>
+          <div class="brief-doc__field">
+            <p class="brief-doc__field-label">What happened</p>
+            <p class="brief-doc__field-text">BAE Systems confirmed at the Hunter-class Preliminary Design Review that structural design authority has formally transferred to Australian-based engineering teams operating under CASG — the first major sovereign capability handover under the program.</p>
+          </div>
+          <div class="brief-doc__field">
+            <p class="brief-doc__field-label">Why it matters</p>
+            <p class="brief-doc__field-text">The transfer activates Australian workforce uplift requirements under the AUKUS Industrial Strategy and sets a contractual precedent for through-life sovereign support obligations — reducing single-supplier concentration risk at the design layer.</p>
+          </div>
+          <div class="brief-doc__angle">
+            <p class="brief-doc__angle-label">Kestrel Angle</p>
+            <p class="brief-doc__angle-text">Advisory firms embedded in CASG or Naval Group should expect accelerated programme assurance and workforce compliance demand as the design authority transfer is operationalised across the supply chain over the next 18 months.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Item 02 -->
+      <div class="brief-doc__item">
+        <span class="brief-doc__item-num">02</span>
+        <div class="brief-doc__item-body">
+          <p class="brief-doc__headline">ASD confirms expanded Cyber Shields initiative with $340M sovereign uplift allocation and 60% domestic workforce floor</p>
+          <div class="brief-doc__field">
+            <p class="brief-doc__field-label">What happened</p>
+            <p class="brief-doc__field-text">The Australian Signals Directorate released updated Cyber Shields program timelines and confirmed a $340M sovereign industry investment tranche, with a new requirement mandating a minimum 60% domestic workforce on all protected workstreams.</p>
+          </div>
+          <div class="brief-doc__field">
+            <p class="brief-doc__field-label">Why it matters</p>
+            <p class="brief-doc__field-text">The workforce mandate creates immediate supply pressure across the cyber advisory sector — domestic cleared talent is already constrained, and the new floor will intensify competition for accredited professionals across government and industry primes.</p>
+          </div>
+          <div class="brief-doc__angle">
+            <p class="brief-doc__angle-label">Kestrel Angle</p>
+            <p class="brief-doc__angle-text">Professional services firms advising ASD-adjacent clients should flag the 60% domestic floor as a near-term staffing constraint in all cyber assurance engagements; workforce sourcing and clearance uplift advisory will be a high-demand line through FY27.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gate: gradient + inline subscribe CTA -->
+      <div class="brief-doc__gate">
+        <div class="brief-doc__gate-fade" aria-hidden="true"></div>
+        <div class="brief-doc__gate-cta">
+          <p class="gate__count">5 more priority developments in today's brief</p>
+          <h2 class="gate__h2">Subscribe to read the full brief.</h2>
+          <form class="gate__form subscribe-form" novalidate>
+            <input type="text" name="name" placeholder="Name (optional)" autocomplete="name">
+            <input type="email" name="email" placeholder="Work email address" required autocomplete="email">
+            <button type="submit" class="btn-primary">Get the brief</button>
+            <div class="form-status" role="status" aria-live="polite"></div>
+          </form>
+          <p class="gate__note">Free. Unsubscribe at any time.</p>
+        </div>
+      </div>
+
+    </div><!-- /brief-doc -->
+  </div>
+</section>
+
+<!-- Differentiators -->
+<section class="diffs">
+  <div class="container">
+    <p class="diffs__eyebrow">Why executives subscribe</p>
+    <div class="diffs__grid">
+      <div class="diff-item">
+        <h3 class="diff-item__label">Signal</h3>
+        <p class="diff-item__text">Kestrel filters 100+ verified sources to the 5–10 developments that require attention. No feeds, no dashboards — just what your morning brief needs.</p>
+      </div>
+      <div class="diff-item">
+        <h3 class="diff-item__label">Format</h3>
+        <p class="diff-item__text">Every item delivers what happened, why it matters strategically, and the advisory angle — structured for your first meeting, not your last scroll.</p>
+      </div>
+      <div class="diff-item">
+        <h3 class="diff-item__label">Coverage</h3>
+        <p class="diff-item__text">Defence Ministers, CASG, ASD, AusTender, parliamentary committees, and ASX-listed primes — the sources that matter to Australian Defence, consolidated.</p>
       </div>
     </div>
-    <div class="footer-bottom">
-      <span class="footer-copy">&copy; 2026 Kestrel. All rights reserved.</span>
-      <span class="footer-product">A <a href="https://quantrim.com" target="_blank" rel="noopener">Quantrim</a> product</span>
+  </div>
+</section>
+
+<!-- Subscribe CTA -->
+<section class="subscribe-block" id="subscribe" aria-labelledby="sub-heading">
+  <div class="container">
+    <h2 class="subscribe-block__h2" id="sub-heading">Start receiving Kestrel.</h2>
+    <p class="subscribe-block__sub">Join Australian Defence and sovereign industry professionals who read Kestrel each morning.</p>
+    <form class="subscribe-block__form subscribe-form" novalidate>
+      <input type="text"  name="name"  placeholder="Name (optional)"    autocomplete="name">
+      <input type="email" name="email" placeholder="Work email address" required autocomplete="email">
+      <button type="submit" class="btn-primary btn-primary--light">Get the brief</button>
+      <div class="form-status" role="status" aria-live="polite"></div>
+    </form>
+    <p class="subscribe-block__note">Free. One email per day. Unsubscribe at any time.</p>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__inner">
+      <div class="site-footer__brand">
+        <img src="/static/logo-dark.png" alt="Kestrel" height="28">
+        <p class="site-footer__tagline">We scan fast, see early and surface what matters.</p>
+      </div>
+      <nav class="site-footer__nav" aria-label="Footer navigation">
+        <a href="#subscribe">Subscribe</a>
+        <a href="/unsubscribe">Unsubscribe</a>
+        <a href="mailto:viji.john@quantrim.com">Contact</a>
+      </nav>
+    </div>
+    <div class="site-footer__bottom">
+      <span>&copy; 2026 Kestrel. All rights reserved.</span>
+      <span>A <a href="https://quantrim.com" target="_blank" rel="noopener">Quantrim</a> product</span>
     </div>
   </div>
 </footer>

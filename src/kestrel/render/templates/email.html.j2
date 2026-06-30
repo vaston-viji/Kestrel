@@ -259,7 +259,7 @@
         {% for ct in brief.austender_contracts %}
         <li style="margin:0 0 7px 0;font-size:11px;color:{{ c.body }};line-height:1.6;">
           <a href="{{ ct.url }}" style="color:{{ c.blue }};font-weight:600;text-decoration:none;">{{ ct.cn_id }}</a>
-          &nbsp;—&nbsp;<span style="color:{{ c.muted }};">{{ ct.agency }}</span>
+          &nbsp;—&nbsp;<span style="color:{{ c.muted }};">{{ ct.agency }}</span>{% if ct.contact_name %}&nbsp;(<span style="color:{{ c.muted }};">{{ ct.contact_name }}</span>){% endif %}
           &nbsp;—&nbsp;<span style="color:{{ c.muted }};">{{ ct.supplier }}</span>
           &nbsp;—&nbsp;{{ ct.title }}
           &nbsp;—&nbsp;<strong>${{ "{:,.0f}".format(ct.value) }}</strong>

@@ -746,6 +746,7 @@ def _load_austender_contracts(cfg: AppConfig, max_age_hours: int = 23) -> list:
                 supplier=i.raw_meta.get("supplier", ""),
                 value=i.raw_meta["value"],
                 description=_short_description(i.title),
+                contact_name=i.raw_meta.get("contact_name", ""),
             )
             for i in all_items
         ]
@@ -758,6 +759,7 @@ def _load_austender_contracts(cfg: AppConfig, max_age_hours: int = 23) -> list:
                         "cn_id": c.cn_id, "title": c.title, "url": c.url,
                         "agency": c.agency, "supplier": c.supplier,
                         "value": c.value, "description": c.description,
+                        "contact_name": c.contact_name,
                     }
                     for c in all_contract_objs
                 ],

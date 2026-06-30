@@ -92,6 +92,8 @@ def _extract_boxes(driver: webdriver.Chrome) -> list[dict]:
                     data["value"] = _parse_value(inner.text) or 0
                 elif label == "Supplier Name":
                     data["supplier"] = inner.text.strip()
+                elif label in ("Contact Name", "Contact Officer", "Contact Officer Name"):
+                    data["contact_name"] = inner.text.strip()
                 elif label in ("\xa0", ""):
                     # Full Details link carries the contract title in its title attr
                     try:
@@ -203,6 +205,7 @@ class AusTenderCollector:
                         "agency": agency,
                         "supplier": supplier,
                         "value": value,
+                        "contact_name": d.get("contact_name", ""),
                     },
                 ))
 
