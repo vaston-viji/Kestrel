@@ -24,6 +24,7 @@ from kestrel.models import (
 from kestrel.render.html import render_html
 from kestrel.render.text import render_text
 from kestrel.render.subject import make_subject
+from kestrel.render.eml import render_eml
 from kestrel.store.db import KestrelDB
 from kestrel.synthesis.anthropic_synth import make_synthesizer
 
@@ -568,11 +569,16 @@ def run(slot: str, cfg: AppConfig, db: KestrelDB) -> dict[str, Any]:
     base = f"kestrel_{slot}_{run_date}"
     html_path = out_dir / f"{base}.html"
     txt_path = out_dir / f"{base}.txt"
+    eml_path = out_dir / f"{base}.eml"
     digest_path = out_dir / f"{base}.digest.md"
     subject_path = out_dir / f"{base}.subject.txt"
 
     html_path.write_text(html_content, encoding="utf-8")
     txt_path.write_text(txt_content, encoding="utf-8")
+    eml_path.write_bytes(render_eml(
+        brief, html_content, txt_content,
+        sender=f"Kestrel <{cfg.audience.feedback_email}>",
+    ))
     digest_path.write_text(digest_md, encoding="utf-8")
     subject_path.write_text(subject, encoding="utf-8")
 
@@ -601,6 +607,7 @@ def run(slot: str, cfg: AppConfig, db: KestrelDB) -> dict[str, Any]:
         "linkedin_manual_check": linkedin,
         "html_path": str(html_path.resolve()),
         "txt_path": str(txt_path.resolve()),
+        "eml_path": str(eml_path.resolve()),
         "digest_path": str(digest_path.resolve()),
     }
     run_json_path = out_dir / f"{base}.run.json"
@@ -615,7 +622,7 @@ def run(slot: str, cfg: AppConfig, db: KestrelDB) -> dict[str, Any]:
     timings["persist"] = time.time() - t0
 
     # ── Stage 12: notify operator ─────────────────────────────────────────────
-    _print_summary(run_json, html_path, linkedin, needs_attention)
+    _print_summary(run_json, html_path, eml_path, linkedin, needs_attention)
     return run_json
 
 
@@ -801,7 +808,7 @@ def _load_austender_contracts(cfg: AppConfig, max_age_hours: int = 23) -> list:
         return []
 
 
-def _print_summary(run_json: dict, html_path: Path,
+def _print_summary(run_json: dict, html_path: Path, eml_path: Path,
                    linkedin: list[str], needs_attention: list[str]) -> None:
     counts = run_json["counts"]
     print("\n" + "=" * 60)
@@ -813,6 +820,7 @@ def _print_summary(run_json: dict, html_path: Path,
     print(f"  Priority: {counts['priority']}  |  "
           f"Policy: {counts['policy']}  Market: {counts['market']}  Tech: {counts['tech']}")
     print(f"\n  HTML: {html_path}")
+    print(f"  EML:  {eml_path}  ← open in Outlook / Mail to send")
     if needs_attention:
         print(f"\n  SOURCES NEEDING ATTENTION (zero yield x2):")
         for s in needs_attention:
