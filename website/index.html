@@ -8,11 +8,11 @@
   <meta property="og:title" content="Kestrel — Australian Defence Intelligence Brief">
   <meta property="og:description" content="Before your first meeting, read Kestrel.">
   <meta property="og:type" content="website">
-  <link rel="icon" type="image/png" href="/static/favicon.png">
+  <link rel="icon" type="image/png" href="static/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
 
@@ -21,8 +21,9 @@
   <div class="container">
     <div class="site-nav__inner">
       <a href="/" class="site-nav__logo" aria-label="Kestrel home">
-        <img src="/static/logo-light.png" alt="Kestrel" height="30">
+        <img src="static/logo-light.png" alt="Kestrel" height="30">
       </a>
+      <span class="site-nav__tagline">Kestrel &mdash; scan fast, see early and surface what matters</span>
       <a href="#subscribe" class="site-nav__cta">Subscribe</a>
     </div>
   </div>
@@ -33,7 +34,7 @@
   <div class="container">
     <p class="hero__eyebrow">Australian Defence &nbsp;·&nbsp; Sovereign Industry &nbsp;·&nbsp; National Security</p>
     <h1 class="hero__h1">Before your first meeting,<br>read Kestrel.</h1>
-    <p class="hero__sub">Daily intelligence covering Australian Defence and sovereign industry — priority developments ready each morning, structured for immediate use.</p>
+    <p class="hero__sub">Daily intelligence covering Australian Defence and sovereign industry —<br>priority developments ready each morning, structured for immediate use.</p>
     <form class="hero__form subscribe-form" novalidate>
       <div class="hero__form-row">
         <input type="email" name="email" placeholder="Work email address" required autocomplete="email">
@@ -53,18 +54,13 @@
 
       <!-- Masthead -->
       <div class="brief-doc__masthead">
-        <img src="/static/logo-light.png" alt="Kestrel" height="52">
-      </div>
-
-      <!-- Disclaimer -->
-      <div class="brief-doc__disclaimer">
-        Sourced through an AI generated market scan where errors, omissions and hallucinations are expected. Reach out to help us improve the scan.
+        <img src="static/logo-light.png" alt="Kestrel" height="52">
       </div>
 
       <!-- Slot bar -->
       <div class="brief-doc__slotbar">
         <p class="brief-doc__tagline"><em>The developments that matter for Australian Defence, sovereign industry and national resilience.</em></p>
-        <p class="brief-doc__slot"><strong>Morning Brief</strong> &nbsp;&middot;&nbsp; Monday 30 June 2026</p>
+        <p class="brief-doc__slot"><strong>Morning Brief</strong> &nbsp;&middot;&nbsp; <span id="brief-doc-date">Monday 30 June 2026</span></p>
       </div>
 
       <!-- Section header -->
@@ -76,18 +72,18 @@
       <div class="brief-doc__item">
         <span class="brief-doc__item-num">01</span>
         <div class="brief-doc__item-body">
-          <p class="brief-doc__headline">Hunter-class structural design authority transferred to Australian sovereign engineering teams</p>
+          <p class="brief-doc__headline blurred">Hunter-class structural design authority transferred to Australian sovereign engineering teams</p>
           <div class="brief-doc__field">
             <p class="brief-doc__field-label">What happened</p>
-            <p class="brief-doc__field-text">BAE Systems confirmed at the Hunter-class Preliminary Design Review that structural design authority has formally transferred to Australian-based engineering teams operating under CASG — the first major sovereign capability handover under the program.</p>
+            <p class="brief-doc__field-text blurred">BAE Systems confirmed at the Hunter-class Preliminary Design Review that structural design authority has formally transferred to Australian-based engineering teams operating under CASG.</p>
           </div>
           <div class="brief-doc__field">
             <p class="brief-doc__field-label">Why it matters</p>
-            <p class="brief-doc__field-text">The transfer activates Australian workforce uplift requirements under the AUKUS Industrial Strategy and sets a contractual precedent for through-life sovereign support obligations — reducing single-supplier concentration risk at the design layer.</p>
+            <p class="brief-doc__field-text blurred">The transfer activates Australian workforce uplift requirements under the AUKUS Industrial Strategy and sets a contractual precedent for through-life sovereign support obligations.</p>
           </div>
           <div class="brief-doc__angle">
             <p class="brief-doc__angle-label">Kestrel Angle</p>
-            <p class="brief-doc__angle-text">Advisory firms embedded in CASG or Naval Group should expect accelerated programme assurance and workforce compliance demand as the design authority transfer is operationalised across the supply chain over the next 18 months.</p>
+            <p class="brief-doc__angle-text blurred">Advisory firms embedded in CASG or Naval Group should expect accelerated programme assurance and workforce compliance demand as the design authority transfer is operationalised.</p>
           </div>
         </div>
       </div>
@@ -96,21 +92,27 @@
       <div class="brief-doc__item">
         <span class="brief-doc__item-num">02</span>
         <div class="brief-doc__item-body">
-          <p class="brief-doc__headline">ASD confirms expanded Cyber Shields initiative with $340M sovereign uplift allocation and 60% domestic workforce floor</p>
-          <div class="brief-doc__field">
-            <p class="brief-doc__field-label">What happened</p>
-            <p class="brief-doc__field-text">The Australian Signals Directorate released updated Cyber Shields program timelines and confirmed a $340M sovereign industry investment tranche, with a new requirement mandating a minimum 60% domestic workforce on all protected workstreams.</p>
-          </div>
-          <div class="brief-doc__field">
-            <p class="brief-doc__field-label">Why it matters</p>
-            <p class="brief-doc__field-text">The workforce mandate creates immediate supply pressure across the cyber advisory sector — domestic cleared talent is already constrained, and the new floor will intensify competition for accredited professionals across government and industry primes.</p>
-          </div>
-          <div class="brief-doc__angle">
-            <p class="brief-doc__angle-label">Kestrel Angle</p>
-            <p class="brief-doc__angle-text">Professional services firms advising ASD-adjacent clients should flag the 60% domestic floor as a near-term staffing constraint in all cyber assurance engagements; workforce sourcing and clearance uplift advisory will be a high-demand line through FY27.</p>
-          </div>
+          <p class="brief-doc__headline blurred">ASD confirms expanded Cyber Shields initiative with $340M sovereign uplift allocation and 60% domestic workforce floor</p>
         </div>
       </div>
+
+      <!-- Watchpoints -->
+      <div class="brief-doc__section-hdr">
+        <span class="brief-doc__section-label brief-doc__section-label--violet">Watchpoints</span>
+      </div>
+      <ul class="brief-doc__bullets">
+        <li class="brief-doc__bullet blurred">Watch for Cabinet reshuffle implications across Defence portfolio appointments ahead of the September estimates round and anticipated IIP revision.</li>
+      </ul>
+
+      <!-- AusTender Movement -->
+      <div class="brief-doc__section-hdr">
+        <span class="brief-doc__section-label brief-doc__section-label--violet">AusTender Movement</span>
+      </div>
+      <ul class="brief-doc__bullets brief-doc__bullets--austender">
+        <li class="brief-doc__bullet blurred">CN0023456789 &nbsp;&middot;&nbsp; Department of Defence &nbsp;&middot;&nbsp; Leidos Australia &nbsp;&middot;&nbsp; Integrated Systems Support Services &nbsp;&middot;&nbsp; <strong>$380,000,000</strong></li>
+        <li class="brief-doc__bullet blurred">CN0023456790 &nbsp;&middot;&nbsp; Australian Signals Directorate &nbsp;&middot;&nbsp; BAE Systems Australia &nbsp;&middot;&nbsp; Cyber Assurance Platform Uplift &nbsp;&middot;&nbsp; <strong>$142,000,000</strong></li>
+        <li class="brief-doc__bullet blurred">CN0023456791 &nbsp;&middot;&nbsp; Defence Science and Technology Group &nbsp;&middot;&nbsp; CSIRO &nbsp;&middot;&nbsp; Advanced Materials Research Program &nbsp;&middot;&nbsp; <strong>$67,500,000</strong></li>
+      </ul>
 
       <!-- Gate: gradient + inline subscribe CTA -->
       <div class="brief-doc__gate">
@@ -140,14 +142,17 @@
       <div class="diff-item">
         <h3 class="diff-item__label">Signal</h3>
         <p class="diff-item__text">Kestrel filters 100+ verified sources to the 5–10 developments that require attention. No feeds, no dashboards — just what your morning brief needs.</p>
+        <p class="diff-item__tagline">The hover before the dive: watching what matters in Defence.</p>
       </div>
       <div class="diff-item">
         <h3 class="diff-item__label">Format</h3>
         <p class="diff-item__text">Every item delivers what happened, why it matters strategically, and the advisory angle — structured for your first meeting, not your last scroll.</p>
+        <p class="diff-item__tagline">What changed, why it matters, what to watch.</p>
       </div>
       <div class="diff-item">
         <h3 class="diff-item__label">Coverage</h3>
         <p class="diff-item__text">Defence Ministers, CASG, ASD, AusTender, parliamentary committees, and ASX-listed primes — the sources that matter to Australian Defence, consolidated.</p>
+        <p class="diff-item__tagline">See it first. Read what matters. Skip the rest.</p>
       </div>
     </div>
   </div>
@@ -173,7 +178,7 @@
   <div class="container">
     <div class="site-footer__inner">
       <div class="site-footer__brand">
-        <img src="/static/logo-dark.png" alt="Kestrel" height="28">
+        <img src="static/logo-dark.png" alt="Kestrel" height="28">
         <p class="site-footer__tagline">We scan fast, see early and surface what matters.</p>
       </div>
       <nav class="site-footer__nav" aria-label="Footer navigation">
@@ -189,6 +194,6 @@
   </div>
 </footer>
 
-<script src="/static/script.js"></script>
+<script src="static/script.js"></script>
 </body>
 </html>

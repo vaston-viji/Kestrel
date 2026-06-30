@@ -1,6 +1,26 @@
 {
-  "scanned_at": "2026-06-29T04:02:33.504200+00:00",
+  "scanned_at": "2026-06-30T03:38:25.723697+00:00",
   "contracts": [
+    {
+      "cn_id": "CN4255585",
+      "title": "ACDP Part Life Refit \u2013 Construction phase",
+      "url": "https://www.tenders.gov.au/Cn/Show/fd9eef9d-7377-4cb6-90a5-ad86b2760fd1",
+      "agency": "CSIRO",
+      "supplier": "Besix Watpac",
+      "value": 281723163,
+      "description": "ACDP Part Life Refit \u2013 Construction phase",
+      "contact_name": ""
+    },
+    {
+      "cn_id": "CN4255306",
+      "title": "Building Works",
+      "url": "https://www.tenders.gov.au/Cn/Show/3bdba0e7-8fd9-418a-869d-f0dd658af3ad",
+      "agency": "Department of Defence",
+      "supplier": "SITZLER PTY LTD",
+      "value": 227675846,
+      "description": "Building Works",
+      "contact_name": "SEG - Infrastructure Division"
+    },
     {
       "cn_id": "CN4252264",
       "title": "Global Media Services",
@@ -8,7 +28,8 @@
       "agency": "Tourism Australia",
       "supplier": "Zenith Media; a division of Publicis Media Australia Pty Ltd",
       "value": 189000000,
-      "description": "Global Media Services"
+      "description": "Global Media Services",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4254720",
@@ -17,7 +38,8 @@
       "agency": "Department of Health, Disability and Ageing",
       "supplier": "Department of Health",
       "value": 134808175,
-      "description": "Aged Care Single Assessment Services"
+      "description": "Aged Care Single Assessment Services",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4254801",
@@ -26,7 +48,8 @@
       "agency": "Department of Defence",
       "supplier": "LOCKHEED MARTIN AUSTRALIA PTY LTD",
       "value": 104582551,
-      "description": "Production Capability Australian Industry Uplift"
+      "description": "Production Capability Australian Industry Uplift",
+      "contact_name": "GWEO"
     },
     {
       "cn_id": "CN4253616",
@@ -35,7 +58,38 @@
       "agency": "Digital Transformation Agency",
       "supplier": "Microsoft Services",
       "value": 101739820,
-      "description": "WofG VSA6 Microsoft Unified Support 2026-29"
+      "description": "WofG VSA6 Microsoft Unified Support 2026-29",
+      "contact_name": ""
+    },
+    {
+      "cn_id": "CN4255330",
+      "title": "Supply of Essential Vaccines to the National Immunisation Program",
+      "url": "https://www.tenders.gov.au/Cn/Show/cc13c872-a1b2-4ec6-92c6-44b93d84d487",
+      "agency": "Department of Health, Disability and Ageing",
+      "supplier": "Merck Sharpe & Dohme (AUSTRALIA) Pt",
+      "value": 100000000,
+      "description": "Supply of Essential Vaccines to the National Immunisation Program",
+      "contact_name": ""
+    },
+    {
+      "cn_id": "CN4254034",
+      "title": "Integrated Capital Works Package-B, Head Contractor",
+      "url": "https://www.tenders.gov.au/Cn/Show/8f47db87-e35d-400c-b12f-4249b1590ba6",
+      "agency": "National Gallery of Australia",
+      "supplier": "Built Pty Ltd",
+      "value": 76826550,
+      "description": "Integrated Capital Works Package-B, Head Contractor",
+      "contact_name": ""
+    },
+    {
+      "cn_id": "CN4255476",
+      "title": "Software Licence",
+      "url": "https://www.tenders.gov.au/Cn/Show/2a359b73-2960-4b04-ad88-0184535a968e",
+      "agency": "Department of Defence",
+      "supplier": "ESRI-AUSTRALIA PTY LTD",
+      "value": 72316860,
+      "description": "Software Licence",
+      "contact_name": "DDG - ICTRD"
     },
     {
       "cn_id": "CN4254377",
@@ -44,7 +98,8 @@
       "agency": "Department of Health, Disability and Ageing",
       "supplier": "Department for Health and Wellbeing T/A SA Health",
       "value": 55309244,
-      "description": "Aged Care Single Assessment Services"
+      "description": "Aged Care Single Assessment Services",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4253398",
@@ -53,7 +108,18 @@
       "agency": "Department of Defence",
       "supplier": "UNIVERSAL MCCANN",
       "value": 48388656,
-      "description": "Campaign Media Advertising Services"
+      "description": "Campaign Media Advertising Services",
+      "contact_name": "DPG - People Services, People Policy and Culture"
+    },
+    {
+      "cn_id": "CN4255336",
+      "title": "Elder Care Support Service",
+      "url": "https://www.tenders.gov.au/Cn/Show/2adefc07-149d-42e1-8bd8-a7b3f6e0dfbb",
+      "agency": "Department of Health, Disability and Ageing",
+      "supplier": "National Aboriginal Community Contr Health Organisation (NACCHO)",
+      "value": 37499795,
+      "description": "Elder Care Support Service",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4253793",
@@ -62,7 +128,8 @@
       "agency": "Department of Defence",
       "supplier": "CEA TECHNOLOGIES PTY LTD",
       "value": 33098011,
-      "description": "High Phased Radar"
+      "description": "High Phased Radar",
+      "contact_name": "ADSS - AIR & SPACE SURVEILLANCE & CONTROL BRANCH"
     },
     {
       "cn_id": "CN4252901",
@@ -71,7 +138,8 @@
       "agency": "Department of Health, Disability and Ageing",
       "supplier": "Australian Healthcare Associates Pt T/A AUSTRALIAN HEALTHCARE ASSOCIATE",
       "value": 25872000,
-      "description": "Services for the Administration of Pharmacy Programs"
+      "description": "Services for the Administration of Pharmacy Programs",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4252607",
@@ -80,7 +148,8 @@
       "agency": "Australian Centre for Disease Control",
       "supplier": "The Sydney Children's Hospital Netw",
       "value": 18318996,
-      "description": "Provision of Immunisation Services 2026-2029"
+      "description": "Provision of Immunisation Services 2026-2029",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4252902",
@@ -89,7 +158,8 @@
       "agency": "Department of Health, Disability and Ageing",
       "supplier": "Department of Health T/A Department of Health and",
       "value": 16016427,
-      "description": "Aged Care Single Assessment Services"
+      "description": "Aged Care Single Assessment Services",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4252900",
@@ -98,7 +168,8 @@
       "agency": "Department of Health, Disability and Ageing",
       "supplier": "Australian Healthcare Associates Pt T/A AUSTRALIAN HEALTHCARE ASSOCIATE",
       "value": 15760000,
-      "description": "Services in Relation to Pharmacy Programs"
+      "description": "Services in Relation to Pharmacy Programs",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4253396",
@@ -107,7 +178,18 @@
       "agency": "Department of Defence",
       "supplier": "UNIVERSAL MCCANN",
       "value": 14300000,
-      "description": "Complex Non-Campaign Media"
+      "description": "Complex Non-Campaign Media",
+      "contact_name": "DPG - People Services, People Policy and Culture"
+    },
+    {
+      "cn_id": "CN4255590",
+      "title": "Software Support and Maintenance",
+      "url": "https://www.tenders.gov.au/Cn/Show/ef69e20a-37d1-42ea-845a-fbd00be5d8a1",
+      "agency": "Department of Defence",
+      "supplier": "RIMINI STREET, INC",
+      "value": 13076212,
+      "description": "Software Support and Maintenance",
+      "contact_name": "DDG - ICTRD"
     },
     {
       "cn_id": "CN4252897",
@@ -116,7 +198,8 @@
       "agency": "Department of Health, Disability and Ageing",
       "supplier": "Australian Healthcare Associates Pt T/A AUSTRALIAN HEALTHCARE ASSOCIATE",
       "value": 12000000,
-      "description": "Work Order 4- Aged Care On Site Pharmacist Measure"
+      "description": "Work Order 4- Aged Care On Site Pharmacist Measure",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4253093",
@@ -125,7 +208,8 @@
       "agency": "Services Australia",
       "supplier": "Sandran",
       "value": 11026805,
-      "description": "Property Lease"
+      "description": "Property Lease",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4252845",
@@ -134,7 +218,18 @@
       "agency": "Australian Federal Police",
       "supplier": "Lamana Development Limited",
       "value": 10996262,
-      "description": "Provision of building construction services"
+      "description": "Provision of building construction services",
+      "contact_name": "PROCUREMENT REPORTING"
+    },
+    {
+      "cn_id": "CN4255290",
+      "title": "Strategic Property Adviser",
+      "url": "https://www.tenders.gov.au/Cn/Show/3bd7abb6-ed8f-46e0-b7aa-064dbfdd57cc",
+      "agency": "Department of Finance",
+      "supplier": "Deloitte Touche Tohmatsu",
+      "value": 10488734,
+      "description": "Strategic Property Adviser",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4252722",
@@ -143,7 +238,8 @@
       "agency": "Department of Defence",
       "supplier": "SERVER RACKS AUSTRALIA PTY LTD",
       "value": 9931252,
-      "description": "Deployed Containerised Facility"
+      "description": "Deployed Containerised Facility",
+      "contact_name": "NSSG - Maritime Sustainment Division"
     },
     {
       "cn_id": "CN4253775",
@@ -152,7 +248,8 @@
       "agency": "Australian Pesticides and Veterinary Medicines Authority",
       "supplier": "xAmplify",
       "value": 9434488,
-      "description": "Managed ICT Services"
+      "description": "Managed ICT Services",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4252693",
@@ -161,7 +258,18 @@
       "agency": "Department of Defence",
       "supplier": "JACOBS SKM",
       "value": 9359119,
-      "description": "Construction Works"
+      "description": "Construction Works",
+      "contact_name": "SEG - Infrastructure Division"
+    },
+    {
+      "cn_id": "CN4255472",
+      "title": "Software Licences Subscription",
+      "url": "https://www.tenders.gov.au/Cn/Show/486e9670-f3ce-445e-84af-cedcce4d0a28",
+      "agency": "Department of Defence",
+      "supplier": "PEGASYSTEMS LTD",
+      "value": 9242995,
+      "description": "Software Licences Subscription",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4254992",
@@ -170,7 +278,8 @@
       "agency": "Department of Employment and Workplace Relations",
       "supplier": "NATIONAL CENTRE FOR VOCATIONAL EDUCATION RESEARCH LTD (NCVER)",
       "value": 8919625,
-      "description": "VDS Digital Sourcing"
+      "description": "VDS Digital Sourcing",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4254654",
@@ -179,7 +288,28 @@
       "agency": "Department of Home Affairs",
       "supplier": "DELL AUSTRALIA PTY LIMITED",
       "value": 8521600,
-      "description": "Hardware Support and Maintenance"
+      "description": "Hardware Support and Maintenance",
+      "contact_name": ""
+    },
+    {
+      "cn_id": "CN4255636",
+      "title": "DTA WoGA for VSA6",
+      "url": "https://www.tenders.gov.au/Cn/Show/51371346-8515-46e2-b87c-7034b141bf00",
+      "agency": "IP Australia",
+      "supplier": "Data#3 Limited",
+      "value": 8255413,
+      "description": "DTA WoGA for VSA6",
+      "contact_name": ""
+    },
+    {
+      "cn_id": "CN4255552",
+      "title": "Vehicle Maintenance",
+      "url": "https://www.tenders.gov.au/Cn/Show/4861eac3-b308-4051-a400-9d7301bbec6c",
+      "agency": "Department of Defence",
+      "supplier": "AUSTAL SHIPS PTY LTD",
+      "value": 8140000,
+      "description": "Vehicle Maintenance",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4252899",
@@ -188,7 +318,38 @@
       "agency": "Department of Health, Disability and Ageing",
       "supplier": "Australian Healthcare Associates Pt T/A AUSTRALIAN HEALTHCARE ASSOCIATE",
       "value": 7164000,
-      "description": "Provision of Administration Pharmacy Services"
+      "description": "Provision of Administration Pharmacy Services",
+      "contact_name": ""
+    },
+    {
+      "cn_id": "CN4255551",
+      "title": "Boat Maintenance",
+      "url": "https://www.tenders.gov.au/Cn/Show/eba7a71b-746c-46ee-a483-c68c96c53b87",
+      "agency": "Department of Defence",
+      "supplier": "AUSTAL SHIPS PTY LTD",
+      "value": 7133080,
+      "description": "Boat Maintenance",
+      "contact_name": ""
+    },
+    {
+      "cn_id": "CN4255537",
+      "title": "Vehicle Components",
+      "url": "https://www.tenders.gov.au/Cn/Show/95f4328b-7277-494f-a88d-c4b5d92deb2c",
+      "agency": "Department of Defence",
+      "supplier": "RHEINMETALL MAN MILITARY VEHICLES AUSTRALIA PTY LTD",
+      "value": 7083683,
+      "description": "Vehicle Components",
+      "contact_name": ""
+    },
+    {
+      "cn_id": "CN4255671",
+      "title": "Commercial Lease - Base property rent",
+      "url": "https://www.tenders.gov.au/Cn/Show/e48d7b8a-938b-4815-9827-8b31616c55fb",
+      "agency": "Austrade",
+      "supplier": "Altis ARET Sub Trust 31 Aware Real Estate Level 19",
+      "value": 6920831,
+      "description": "Commercial Lease - Base property rent",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4254721",
@@ -197,7 +358,8 @@
       "agency": "Department of Health, Disability and Ageing",
       "supplier": "CANBERRA HEALTH SERVICES The Canberra Hospital",
       "value": 6619755,
-      "description": "Aged Care Single Assessment Services"
+      "description": "Aged Care Single Assessment Services",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4254494",
@@ -206,16 +368,8 @@
       "agency": "Australian Centre for International Agricultural Research",
       "supplier": "University of Queensland",
       "value": 5457457,
-      "description": "Transforming mango production through IPM and smarter pesticide use in\u2026"
-    },
-    {
-      "cn_id": "CN4252219",
-      "title": "Automation Testing resources squad",
-      "url": "https://www.tenders.gov.au/Cn/Show/86635622-f843-406e-9dcb-b69744ad0ab8",
-      "agency": "Australian Securities and Investments Commission",
-      "supplier": "ADACTIN GROUP PTY LTD",
-      "value": 5241139,
-      "description": "Automation Testing resources squad"
+      "description": "Transforming mango production through IPM and smarter pesticide use in\u2026",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4253943",
@@ -224,7 +378,18 @@
       "agency": "Department of Defence",
       "supplier": "LEIDOS AUSTRALIA PTY LIMITED",
       "value": 4996940,
-      "description": "Detection Equipment"
+      "description": "Detection Equipment",
+      "contact_name": ""
+    },
+    {
+      "cn_id": "CN4255481",
+      "title": "Road Works",
+      "url": "https://www.tenders.gov.au/Cn/Show/50ea5bce-e51f-46cc-a5b1-3a0dc20bbd4e",
+      "agency": "Department of Defence",
+      "supplier": "BPAC TRADING PTY LTD",
+      "value": 4984441,
+      "description": "Road Works",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4255025",
@@ -233,7 +398,8 @@
       "agency": "Australian Criminal Intelligence Commission",
       "supplier": "Millennium Security Specialist Services Pty Ltd",
       "value": 4824877,
-      "description": "Security Guarding Services"
+      "description": "Security Guarding Services",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4254042",
@@ -242,7 +408,8 @@
       "agency": "Australian Submarine Agency",
       "supplier": "AURECON AUSTRALASIA PTY LTD",
       "value": 4568034,
-      "description": "Project Management Services"
+      "description": "Project Management Services",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4249186",
@@ -251,7 +418,8 @@
       "agency": "National Blood Authority",
       "supplier": "South Australian Department for Health and Wellbeing",
       "value": 4302295,
-      "description": "Blood Safe eLearning"
+      "description": "Blood Safe eLearning",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4254481",
@@ -260,7 +428,8 @@
       "agency": "National Gallery of Australia",
       "supplier": "Perpetual Energy P/L",
       "value": 4153178,
-      "description": "Natural Gas Supply"
+      "description": "Natural Gas Supply",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4254666",
@@ -269,7 +438,8 @@
       "agency": "Department of Home Affairs",
       "supplier": "RED HAT ASIA-PACIFIC PTY. LTD.",
       "value": 4124720,
-      "description": "Software Licences"
+      "description": "Software Licences",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4253661",
@@ -278,7 +448,8 @@
       "agency": "Department of Education",
       "supplier": "AUSTRALIAN COUNCIL FOR EDUCATIONAL RESEARCH (ACER)",
       "value": 3623499,
-      "description": "National Project Manager for Programme for International Student Assessment (PISA)\u2026"
+      "description": "National Project Manager for Programme for International Student Assessment (PISA)\u2026",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4254043",
@@ -287,16 +458,8 @@
       "agency": "Australian Submarine Agency",
       "supplier": "SERVEGATE AUSTRALIA PTY LTD",
       "value": 3574549,
-      "description": "Project Management Services"
-    },
-    {
-      "cn_id": "CN4252380-A1",
-      "title": "Variation 17 to utilise available extension period.",
-      "url": "https://www.tenders.gov.au/Cn/Show/54d58063-06c9-46eb-b5cd-1034c8b2683e",
-      "agency": "National Archives of Australia",
-      "supplier": "Chalfont Consulting Pty Ltd",
-      "value": 3484141,
-      "description": "Variation 17 to utilise available extension period."
+      "description": "Project Management Services",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4252858",
@@ -305,7 +468,18 @@
       "agency": "Australian Federal Police",
       "supplier": "Red Hat Asia-Pacific Pty. Ltd.",
       "value": 3422576,
-      "description": "Provision of software licences and support"
+      "description": "Provision of software licences and support",
+      "contact_name": ""
+    },
+    {
+      "cn_id": "CN4255335",
+      "title": "National Clinical Practice Guidelines for Menopause and Perimenopause",
+      "url": "https://www.tenders.gov.au/Cn/Show/80d6412d-54c8-4524-9e03-3abb0e6e52ab",
+      "agency": "Department of Health, Disability and Ageing",
+      "supplier": "Monash University",
+      "value": 3189450,
+      "description": "National Clinical Practice Guidelines for Menopause and Perimenopause",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4252906",
@@ -314,7 +488,8 @@
       "agency": "Department of Health, Disability and Ageing",
       "supplier": "Australian Healthcare Associates Pt T/A AUSTRALIAN HEALTHCARE ASSOCIATE",
       "value": 3176000,
-      "description": "Administration of the Take Home Naloxone Program"
+      "description": "Administration of the Take Home Naloxone Program",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4253050",
@@ -323,7 +498,8 @@
       "agency": "Australian Institute of Family Studies",
       "supplier": "Jones Lang LaSalle (ACT) Pty Ltd",
       "value": 3101480,
-      "description": "Lease of office buildings for AIFS"
+      "description": "Lease of office buildings for AIFS",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4254960",
@@ -332,16 +508,8 @@
       "agency": "Australian Federal Police",
       "supplier": "Nuix Pty Ltd",
       "value": 3080000,
-      "description": "Supply of software licences"
-    },
-    {
-      "cn_id": "CN4252192",
-      "title": "Release Management Services",
-      "url": "https://www.tenders.gov.au/Cn/Show/bf05f3af-7493-4a55-97ad-2aa46e8e3ecd",
-      "agency": "Department of Health, Disability and Ageing",
-      "supplier": "ESERVE CONSULTING PTY LTD",
-      "value": 3014000,
-      "description": "Release Management Services"
+      "description": "Supply of software licences",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4252612",
@@ -350,7 +518,8 @@
       "agency": "Australian Centre for Disease Control",
       "supplier": "National Aboriginal Community Contr Health Organisation (NACCHO)",
       "value": 3000000,
-      "description": "NACCHO Support of Diphtheria Response"
+      "description": "NACCHO Support of Diphtheria Response",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4253426",
@@ -359,7 +528,8 @@
       "agency": "Department of Defence",
       "supplier": "LS TELCOM",
       "value": 2915000,
-      "description": "Monitoring Equipment"
+      "description": "Monitoring Equipment",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4253087",
@@ -368,7 +538,18 @@
       "agency": "Services Australia",
       "supplier": "THE SHELLAS SUPERANNUATION FUND",
       "value": 2907802,
-      "description": "Property Lease"
+      "description": "Property Lease",
+      "contact_name": ""
+    },
+    {
+      "cn_id": "CN4255601",
+      "title": "Microsoft VSA 6 five years agreement",
+      "url": "https://www.tenders.gov.au/Cn/Show/a23fccf9-c7a8-4e40-abaf-32eaefe95c2d",
+      "agency": "Australian Radiation Protection and Nuclear Safety Agency",
+      "supplier": "Data #3 Limited",
+      "value": 2795672,
+      "description": "Microsoft VSA 6 five years agreement",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4252710",
@@ -377,7 +558,8 @@
       "agency": "Department of Defence",
       "supplier": "NUIX LIMITED",
       "value": 2756161,
-      "description": "Software Licences Subscription"
+      "description": "Software Licences Subscription",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4254330",
@@ -386,7 +568,8 @@
       "agency": "Attorney-General's Department",
       "supplier": "Cushman & Wakefield Real Estate",
       "value": 2750000,
-      "description": "Property Operating Expenses"
+      "description": "Property Operating Expenses",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4254970",
@@ -395,7 +578,8 @@
       "agency": "Australian Federal Police",
       "supplier": "Dell Australia Pty Limited",
       "value": 2748737,
-      "description": "Supply of computer equipment"
+      "description": "Supply of computer equipment",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4253794",
@@ -404,7 +588,8 @@
       "agency": "Department of Defence",
       "supplier": "WARTSILA AUSTRALIA PTY LTD",
       "value": 2430369,
-      "description": "Marine Spare Parts"
+      "description": "Marine Spare Parts",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4253355",
@@ -413,7 +598,18 @@
       "agency": "Department of Defence",
       "supplier": "UNIVERSITY OF MELBOURNE",
       "value": 2392500,
-      "description": "Research Agreement"
+      "description": "Research Agreement",
+      "contact_name": ""
+    },
+    {
+      "cn_id": "CN4255613",
+      "title": "Australian Milk Residue Analysis Survey 2026-2029",
+      "url": "https://www.tenders.gov.au/Cn/Show/cef04433-90b9-4779-8c32-b1997a515a34",
+      "agency": "Department of Agriculture, Fisheries and Forestry",
+      "supplier": "DAIRY FOOD SAFETY VICTORIA",
+      "value": 2347567,
+      "description": "Australian Milk Residue Analysis Survey 2026-2029",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4253077",
@@ -422,7 +618,8 @@
       "agency": "Services Australia",
       "supplier": "Clarence Property Corporation Limit",
       "value": 2345698,
-      "description": "Property Lease"
+      "description": "Property Lease",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4252898",
@@ -431,7 +628,8 @@
       "agency": "Department of Health, Disability and Ageing",
       "supplier": "Australian Healthcare Associates Pt T/A AUSTRALIAN HEALTHCARE ASSOCIATE",
       "value": 2208000,
-      "description": "Work Order 5 - Administration Pharmacy Services"
+      "description": "Work Order 5 - Administration Pharmacy Services",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4252903",
@@ -440,7 +638,8 @@
       "agency": "Department of Health, Disability and Ageing",
       "supplier": "Altis Consulting Pty Ltd",
       "value": 2200000,
-      "description": "Data Specialist Services"
+      "description": "Data Specialist Services",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4254651",
@@ -449,7 +648,8 @@
       "agency": "Department of Home Affairs",
       "supplier": "DELOITTE TOUCHE TOHMATSU",
       "value": 2160000,
-      "description": "Specialist Service procurement"
+      "description": "Specialist Service procurement",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4254045",
@@ -458,7 +658,8 @@
       "agency": "Australian Submarine Agency",
       "supplier": "BUSINESS REVIEW GROUP PTY. LTD.",
       "value": 2142811,
-      "description": "Program Costing Support Services"
+      "description": "Program Costing Support Services",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4254800",
@@ -467,7 +668,8 @@
       "agency": "Department of Defence",
       "supplier": "DDLS AUSTRALIA PTY LIMITED",
       "value": 2000000,
-      "description": "Training Services"
+      "description": "Training Services",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4253668",
@@ -476,7 +678,8 @@
       "agency": "Department of Education",
       "supplier": "BDO SERVICES PTY LTD",
       "value": 2000000,
-      "description": "Professional Services - Surge Capability"
+      "description": "Professional Services - Surge Capability",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4253662",
@@ -485,7 +688,8 @@
       "agency": "Department of Education",
       "supplier": "REASON GROUP PTY LTD",
       "value": 2000000,
-      "description": "Professional Services and Consulting"
+      "description": "Professional Services and Consulting",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4253664",
@@ -494,7 +698,8 @@
       "agency": "Department of Education",
       "supplier": "CONCEPTSIX PTY LTD",
       "value": 2000000,
-      "description": "Professional Services and Consulting"
+      "description": "Professional Services and Consulting",
+      "contact_name": ""
     },
     {
       "cn_id": "CN4253663",
@@ -503,7 +708,8 @@
       "agency": "Department of Education",
       "supplier": "SOLSTICEIT",
       "value": 2000000,
-      "description": "Professional Services and Consulting"
+      "description": "Professional Services and Consulting",
+      "contact_name": ""
     }
   ]
 }

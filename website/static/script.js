@@ -2,7 +2,7 @@
 'use strict';
 
 /* ── Nav scroll effect ─────────────────────────────────── */
-const nav = document.querySelector('.nav');
+const nav = document.querySelector('.site-nav');
 if (nav) {
   const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 8);
   window.addEventListener('scroll', onScroll, { passive: true });
@@ -110,6 +110,16 @@ if (emailParam) {
   const emailInput = document.querySelector('#unsub-email');
   if (emailInput) emailInput.value = decodeURIComponent(emailParam);
 }
+
+/* ── Dynamic brief date ────────────────────────────────── */
+(function () {
+  const el = document.getElementById('brief-doc-date');
+  if (!el) return;
+  const DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const now = new Date();
+  el.textContent = `${DAYS[now.getDay()]} ${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()}`;
+})();
 
 /* ── Wire up forms ─────────────────────────────────────── */
 document.querySelectorAll('.subscribe-form').forEach(f =>
