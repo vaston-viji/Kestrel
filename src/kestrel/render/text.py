@@ -61,6 +61,21 @@ def render_text(brief: Brief) -> str:
         for wp in brief.watchpoints:
             parts.append(wp)
 
+    # AusTender movement (highest-value contract events)
+    if brief.austender_contracts:
+        parts.append(
+            f"\nAUSTENDER MOVEMENT ({len(brief.austender_contracts)})\n" + _DIV
+        )
+        for ct in brief.austender_contracts:
+            agency = ct.agency
+            if ct.contact_name:
+                agency += f" ({ct.contact_name})"
+            parts.append(
+                f"- {ct.cn_id} — {agency}"
+                f"\n  {ct.supplier} — {ct.title} — ${ct.value:,.0f}"
+                f"\n  {ct.url}"
+            )
+
     # Footnote
     parts.append(f"\n{_SEP}")
     parts.append("This email was created by AI. Errors & Omissions Expected.")
