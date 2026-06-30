@@ -124,7 +124,8 @@ if (emailParam) {
 /* ── Contact modal ─────────────────────────────────────── */
 (function () {
   const overlay  = document.getElementById('contact-modal');
-  const openBtn  = document.getElementById('open-contact-modal');
+  // Support any number of trigger buttons via data attribute
+
   const closeBtn = document.getElementById('close-contact-modal');
   const doneClose = document.getElementById('contact-done-close');
   const form     = document.getElementById('contact-form');
@@ -187,7 +188,9 @@ if (emailParam) {
     if (e.target === overlay) closeModal();
   });
 
-  if (openBtn)   openBtn.addEventListener('click', openModal);
+  document.querySelectorAll('[data-open-contact-modal]').forEach(btn =>
+    btn.addEventListener('click', openModal)
+  );
   if (closeBtn)  closeBtn.addEventListener('click', closeModal);
   if (doneClose) doneClose.addEventListener('click', closeModal);
 

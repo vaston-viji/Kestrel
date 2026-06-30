@@ -8,16 +8,26 @@
   <link rel="icon" type="image/png" href="static/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
 
-<main class="unsub-page" role="main">
+<!-- Navigation -->
+<nav class="site-nav" role="navigation" aria-label="Main">
+  <div class="container">
+    <div class="site-nav__inner">
+      <a href="index.html" class="site-nav__logo" aria-label="Kestrel home">
+        <img src="static/logo-light.png" alt="Kestrel" height="30">
+      </a>
+      <span class="site-nav__tagline">Kestrel &mdash; scan fast, see early and surface what matters</span>
+      <a href="index.html#subscribe" class="site-nav__cta">Subscribe</a>
+    </div>
+  </div>
+</nav>
 
-  <a href="/" aria-label="Back to Kestrel home">
-    <img src="static/logo-light.png" class="unsub-logo" alt="Kestrel">
-  </a>
+<!-- Unsubscribe page body -->
+<main class="unsub-page" role="main">
 
   <div class="unsub-card">
 
@@ -38,7 +48,7 @@
         >
         <button type="submit" class="btn-danger">Confirm unsubscribe</button>
         <div class="form-status" role="status" aria-live="polite"></div>
-        <a href="/" class="btn-ghost">Keep receiving Kestrel</a>
+        <a href="index.html" class="btn-ghost">Keep receiving Kestrel</a>
       </form>
     </div>
 
@@ -47,12 +57,81 @@
       <div class="unsub-done-icon" aria-hidden="true">&#10003;</div>
       <h2>You've been unsubscribed</h2>
       <p>We've removed you from the daily brief. You won't receive any further emails.</p>
-      <p>Changed your mind? <a href="/#subscribe" style="color:var(--violet);font-weight:600;text-decoration:none;">Re-subscribe here.</a></p>
+      <p>Changed your mind? <a href="index.html#subscribe" style="color:var(--violet);font-weight:600;">Re-subscribe here.</a></p>
     </div>
 
   </div>
 
 </main>
+
+<!-- Footer -->
+<footer class="site-footer unsub-footer">
+  <div class="container">
+    <div class="site-footer__inner">
+      <div class="site-footer__brand">
+        <img src="static/logo-dark.png" alt="Kestrel" height="28">
+        <p class="site-footer__tagline">We scan fast, see early and surface what matters.</p>
+      </div>
+      <nav class="site-footer__nav" aria-label="Footer navigation">
+        <a href="index.html#subscribe">Subscribe</a>
+        <button class="footer-modal-btn" data-open-contact-modal>Contact</button>
+        <button class="footer-modal-btn" data-open-contact-modal>Feedback &amp; Sponsorships</button>
+      </nav>
+    </div>
+    <div class="site-footer__bottom">
+      <span>&copy; 2026 Kestrel. All rights reserved.</span>
+      <span>A <a href="https://quantrim.com" target="_blank" rel="noopener">Quantrim</a> product</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Contact / Feedback & Sponsorships modal -->
+<div class="modal-overlay" id="contact-modal" role="dialog" aria-modal="true" aria-labelledby="contact-modal-title">
+  <div class="modal-card" role="document">
+    <button class="modal-close" id="close-contact-modal" aria-label="Close">&times;</button>
+    <h2 class="modal-title" id="contact-modal-title">Feedback &amp; Sponsorships</h2>
+    <p class="modal-sub">Questions, feedback, or sponsorship enquiries — we'd love to hear from you.</p>
+
+    <form class="contact-form" id="contact-form" novalidate>
+      <!-- Honeypot — hidden from humans, bots fill it in -->
+      <input type="text" name="_gotcha" class="contact-honeypot" tabindex="-1" autocomplete="off">
+
+      <div class="contact-grid">
+        <div class="contact-field">
+          <label for="cf-name">Name <span aria-hidden="true">*</span></label>
+          <input type="text" id="cf-name" name="name" required autocomplete="name" placeholder="Your name">
+        </div>
+        <div class="contact-field">
+          <label for="cf-company">Company</label>
+          <input type="text" id="cf-company" name="company" autocomplete="organization" placeholder="Organisation (optional)">
+        </div>
+      </div>
+      <div class="contact-field">
+        <label for="cf-email">Email <span aria-hidden="true">*</span></label>
+        <input type="email" id="cf-email" name="email" required autocomplete="email" placeholder="your@email.com">
+      </div>
+      <div class="contact-field">
+        <label for="cf-message">Message <span aria-hidden="true">*</span></label>
+        <textarea id="cf-message" name="message" rows="4" required placeholder="Your message…"></textarea>
+      </div>
+      <div class="contact-field contact-field--challenge">
+        <label for="cf-challenge"><span id="challenge-question">What is 3 + 4?</span> <span aria-hidden="true">*</span></label>
+        <input type="number" id="cf-challenge" name="challenge" required autocomplete="off" placeholder="Answer" style="max-width:120px;">
+      </div>
+
+      <div class="form-status" id="contact-status" role="status" aria-live="polite"></div>
+      <button type="submit" class="btn-primary contact-submit">Send message</button>
+    </form>
+
+    <!-- Success state -->
+    <div class="contact-done" id="contact-done" hidden>
+      <div class="contact-done__icon" aria-hidden="true">&#10003;</div>
+      <h3 class="contact-done__h3">Message sent</h3>
+      <p class="contact-done__p">Thanks — we'll be in touch shortly.</p>
+      <button class="btn-ghost" id="contact-done-close">Close</button>
+    </div>
+  </div>
+</div>
 
 <script src="static/script.js"></script>
 </body>

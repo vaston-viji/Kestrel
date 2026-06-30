@@ -571,13 +571,11 @@ a { color: inherit; text-decoration: none; }
 
 /* ── Unsubscribe page ───────────────────────────────────── */
 .unsub-page {
-  min-height: 100vh;
   background: var(--grey);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 40px 24px;
+  padding: 80px 24px;
 }
 .unsub-logo { height: 36px; margin-bottom: 40px; }
 .unsub-card {
