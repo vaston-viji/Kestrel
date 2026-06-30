@@ -111,6 +111,56 @@ def _extract_boxes(driver: webdriver.Chrome) -> list[dict]:
     return results
 
 
+def _extract_contact_name(driver: webdriver.Chrome) -> str:
+    """Read the 'Contact Name' value from a contract DETAIL page (Cn/Show/...).
+
+    Detail-page markup is: <p><span>Contact Name:</span><br>VALUE</p>.
+    The search listing does not expose this field, only the detail page does.
+    """
+    for p in driver.find_elements(
+        By.XPATH, "//p[span[contains(normalize-space(.), 'Contact Name')]]"
+    ):
+        txt = (p.text or "").strip()
+        if ":" in txt:
+            val = txt.split(":", 1)[1].strip()
+            if val:
+                return val
+    return ""
+
+
+def fetch_contact_names(urls: list[str], timeout: int = 30) -> dict[str, str]:
+    """Visit each contract detail page and return {url: contact_name}.
+
+    Used to enrich only the final displayed selection (e.g. the top 10), since
+    visiting every contract's detail page would be slow and wasteful.
+    """
+    if not urls or not Path(DRIVER_PATH).exists():
+        return {}
+    out: dict[str, str] = {}
+    driver = None
+    try:
+        driver = _build_driver(timeout)
+        for url in urls:
+            try:
+                driver.get(url)
+                WebDriverWait(driver, 15).until(
+                    EC.presence_of_element_located((By.TAG_NAME, "body"))
+                )
+                name = _extract_contact_name(driver)
+                if name:
+                    out[url] = name
+                    log.info("AusTender contact for %s: %s", url.rsplit("/", 1)[-1], name)
+            except Exception as exc:
+                log.warning("AusTender detail fetch failed for %s: %s", url, exc)
+    finally:
+        if driver:
+            try:
+                driver.quit()
+            except Exception:
+                pass
+    return out
+
+
 class AusTenderCollector:
     def __init__(self, timeout: int = 45, min_value: int = MIN_VALUE) -> None:
         self._timeout = timeout

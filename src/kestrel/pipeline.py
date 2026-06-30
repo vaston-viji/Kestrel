@@ -751,6 +751,28 @@ def _load_austender_contracts(cfg: AppConfig, max_age_hours: int = 23) -> list:
             for i in all_items
         ]
 
+        # Determine the display selection first (Defence-agency filter, top 10 by value)
+        if agency_filter:
+            filtered = [
+                c for c in all_contract_objs
+                if _agency_matches_filter(c.agency, agency_filter)
+            ]
+        else:
+            filtered = all_contract_objs
+        selection = sorted(filtered, key=lambda c: c.value, reverse=True)[:10]
+
+        # Enrich ONLY the displayed selection with the contact officer — the search
+        # listing omits it, so we follow each contract's detail page. These objects
+        # are shared with all_contract_objs, so the contact also lands in the cache.
+        try:
+            from kestrel.collectors.austender import fetch_contact_names
+            contacts = fetch_contact_names([c.url for c in selection])
+            for c in selection:
+                if contacts.get(c.url):
+                    c.contact_name = contacts[c.url]
+        except Exception as exc:
+            log.warning("AusTender: contact enrichment failed — %s", exc)
+
         cache_path.write_text(
             json.dumps({
                 "scanned_at": datetime.now(timezone.utc).isoformat(),
@@ -771,16 +793,7 @@ def _load_austender_contracts(cfg: AppConfig, max_age_hours: int = 23) -> list:
             len(all_contract_objs), cache_path,
         )
 
-        # Now apply agency filter for display
-        if agency_filter:
-            filtered = [
-                c for c in all_contract_objs
-                if _agency_matches_filter(c.agency, agency_filter)
-            ]
-        else:
-            filtered = all_contract_objs
-
-        return sorted(filtered, key=lambda c: c.value, reverse=True)[:10]
+        return selection
 
     except Exception as exc:
         log.warning("AusTender: scan failed — %s", exc)
