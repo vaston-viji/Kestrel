@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import logging
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 
 import openpyxl
@@ -29,7 +30,8 @@ log = logging.getLogger(__name__)
 HERE         = Path(__file__).parent                   # website/
 PROJECT_ROOT = HERE.parent                             # kestrel/
 DATA_DIR     = PROJECT_ROOT / "data"
-SUBS_PATH    = DATA_DIR / "subscribers.xlsx"
+SUBS_PATH     = DATA_DIR / "subscribers.xlsx"
+FEEDBACK_PATH = DATA_DIR / "feedback.xlsx"
 
 _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
@@ -50,6 +52,17 @@ def _ensure_workbook() -> openpyxl.Workbook:
     return wb
 
 
+def _ensure_feedback_workbook() -> openpyxl.Workbook:
+    if FEEDBACK_PATH.exists():
+        return openpyxl.load_workbook(FEEDBACK_PATH)
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Feedback"
+    ws.append(["Timestamp", "Name", "Company", "Email", "Message"])
+    wb.save(FEEDBACK_PATH)
+    return wb
+
+
 def _find_row(ws, email: str):
     """Return the row tuple (row_idx, name, email, pref) or None."""
     email_lower = email.lower()
@@ -67,6 +80,13 @@ class SubscribeRequest(BaseModel):
 
 class UnsubscribeRequest(BaseModel):
     email: str
+
+
+class ContactRequest(BaseModel):
+    name: str
+    company: str = ""
+    email: str
+    message: str
 
 
 # ── Routes ─────────────────────────────────────────────────────────────────
@@ -129,6 +149,28 @@ async def unsubscribe(req: UnsubscribeRequest):
     log.info("Unsubscribed: %s", email)
     return JSONResponse({"status": "ok",
                          "message": "Done — you've been unsubscribed from the daily brief."})
+
+
+@app.post("/api/contact")
+async def contact(req: ContactRequest):
+    name    = req.name.strip()
+    email   = req.email.strip()
+    message = req.message.strip()
+
+    if not name or not message:
+        raise HTTPException(status_code=422, detail="Name and message are required.")
+    if not email or not _EMAIL_RE.match(email):
+        raise HTTPException(status_code=422, detail="Please provide a valid email address.")
+    if len(message) > 4000:
+        raise HTTPException(status_code=422, detail="Message is too long (max 4000 characters).")
+
+    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    wb = _ensure_feedback_workbook()
+    ws = wb.active
+    ws.append([timestamp, name, req.company.strip(), email, message])
+    wb.save(FEEDBACK_PATH)
+    log.info("Contact submission from: %s <%s>", name, email)
+    return JSONResponse({"status": "ok", "message": "Message received — thank you."})
 
 
 # ── Dev runner ─────────────────────────────────────────────────────────────

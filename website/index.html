@@ -184,7 +184,7 @@
       <nav class="site-footer__nav" aria-label="Footer navigation">
         <a href="#subscribe">Subscribe</a>
         <a href="/unsubscribe">Unsubscribe</a>
-        <a href="mailto:product@quantrim.com">Contact</a>
+        <button class="footer-modal-btn" id="open-contact-modal">Feedback &amp; Sponsorships</button>
       </nav>
     </div>
     <div class="site-footer__bottom">
@@ -193,6 +193,54 @@
     </div>
   </div>
 </footer>
+
+<!-- Contact / Feedback & Sponsorships modal -->
+<div class="modal-overlay" id="contact-modal" role="dialog" aria-modal="true" aria-labelledby="contact-modal-title">
+  <div class="modal-card" role="document">
+    <button class="modal-close" id="close-contact-modal" aria-label="Close">&times;</button>
+    <h2 class="modal-title" id="contact-modal-title">Feedback &amp; Sponsorships</h2>
+    <p class="modal-sub">Questions, feedback, or sponsorship enquiries — we'd love to hear from you.</p>
+
+    <form class="contact-form" id="contact-form" novalidate>
+      <!-- Honeypot — hidden from humans, bots fill it in -->
+      <input type="text" name="_gotcha" class="contact-honeypot" tabindex="-1" autocomplete="off">
+
+      <div class="contact-grid">
+        <div class="contact-field">
+          <label for="cf-name">Name <span aria-hidden="true">*</span></label>
+          <input type="text" id="cf-name" name="name" required autocomplete="name" placeholder="Your name">
+        </div>
+        <div class="contact-field">
+          <label for="cf-company">Company</label>
+          <input type="text" id="cf-company" name="company" autocomplete="organization" placeholder="Organisation (optional)">
+        </div>
+      </div>
+      <div class="contact-field">
+        <label for="cf-email">Email <span aria-hidden="true">*</span></label>
+        <input type="email" id="cf-email" name="email" required autocomplete="email" placeholder="your@email.com">
+      </div>
+      <div class="contact-field">
+        <label for="cf-message">Message <span aria-hidden="true">*</span></label>
+        <textarea id="cf-message" name="message" rows="4" required placeholder="Your message…"></textarea>
+      </div>
+      <div class="contact-field contact-field--challenge">
+        <label for="cf-challenge"><span id="challenge-question">What is 3 + 4?</span> <span aria-hidden="true">*</span></label>
+        <input type="number" id="cf-challenge" name="challenge" required autocomplete="off" placeholder="Answer" style="max-width:120px;">
+      </div>
+
+      <div class="form-status" id="contact-status" role="status" aria-live="polite"></div>
+      <button type="submit" class="btn-primary contact-submit">Send message</button>
+    </form>
+
+    <!-- Success state -->
+    <div class="contact-done" id="contact-done" hidden>
+      <div class="contact-done__icon" aria-hidden="true">&#10003;</div>
+      <h3 class="contact-done__h3">Message sent</h3>
+      <p class="contact-done__p">Thanks — we'll be in touch shortly.</p>
+      <button class="btn-ghost" id="contact-done-close">Close</button>
+    </div>
+  </div>
+</div>
 
 <script src="static/script.js"></script>
 </body>

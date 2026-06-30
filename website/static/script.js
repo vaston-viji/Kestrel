@@ -121,6 +121,134 @@ if (emailParam) {
   el.textContent = `${DAYS[now.getDay()]} ${now.getDate()} ${MONTHS[now.getMonth()]} ${now.getFullYear()}`;
 })();
 
+/* ── Contact modal ─────────────────────────────────────── */
+(function () {
+  const overlay  = document.getElementById('contact-modal');
+  const openBtn  = document.getElementById('open-contact-modal');
+  const closeBtn = document.getElementById('close-contact-modal');
+  const doneClose = document.getElementById('contact-done-close');
+  const form     = document.getElementById('contact-form');
+  const doneEl   = document.getElementById('contact-done');
+  const statusEl = document.getElementById('contact-status');
+
+  if (!overlay) return;
+
+  let _challengeAnswer = 0;
+  let _lastFocus = null;
+
+  function setupChallenge() {
+    const a = Math.floor(Math.random() * 9) + 1;
+    const b = Math.floor(Math.random() * 9) + 1;
+    _challengeAnswer = a + b;
+    document.getElementById('challenge-question').textContent = `What is ${a} + ${b}?`;
+    const input = document.getElementById('cf-challenge');
+    if (input) input.value = '';
+  }
+
+  function openModal() {
+    _lastFocus = document.activeElement;
+    setupChallenge();
+    form.reset();
+    form.style.display = '';
+    if (doneEl) doneEl.hidden = true;
+    if (statusEl) { statusEl.className = 'form-status'; statusEl.textContent = ''; }
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    // Focus first field after transition
+    setTimeout(() => {
+      const first = overlay.querySelector('input:not([tabindex="-1"]):not(.contact-honeypot)');
+      if (first) first.focus();
+    }, 60);
+  }
+
+  function closeModal() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+    if (_lastFocus) _lastFocus.focus();
+  }
+
+  // Trap focus within modal
+  overlay.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { closeModal(); return; }
+    if (e.key !== 'Tab') return;
+    const focusable = Array.from(overlay.querySelectorAll(
+      'button:not([disabled]), input:not([tabindex="-1"]):not(.contact-honeypot), textarea, select, [tabindex]:not([tabindex="-1"])'
+    )).filter(el => !el.closest('[hidden]'));
+    if (!focusable.length) return;
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (e.shiftKey ? document.activeElement === first : document.activeElement === last) {
+      e.preventDefault();
+      (e.shiftKey ? last : first).focus();
+    }
+  });
+
+  // Close on overlay background click (not on card)
+  overlay.addEventListener('click', function (e) {
+    if (e.target === overlay) closeModal();
+  });
+
+  if (openBtn)   openBtn.addEventListener('click', openModal);
+  if (closeBtn)  closeBtn.addEventListener('click', closeModal);
+  if (doneClose) doneClose.addEventListener('click', closeModal);
+
+  /* ── Contact form submission ─────────────────────────── */
+  if (form) form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const btn    = form.querySelector('.contact-submit');
+    const name   = form.querySelector('[name="name"]').value.trim();
+    const company = form.querySelector('[name="company"]').value.trim();
+    const email  = form.querySelector('[name="email"]').value.trim();
+    const message = form.querySelector('[name="message"]').value.trim();
+    const gotcha  = form.querySelector('[name="_gotcha"]').value;
+    const challenge = parseInt(form.querySelector('[name="challenge"]').value, 10);
+
+    // Honeypot — bail silently if filled (bot)
+    if (gotcha) { closeModal(); return; }
+
+    // Math challenge client-side check
+    if (isNaN(challenge) || challenge !== _challengeAnswer) {
+      statusEl.textContent = 'Incorrect answer to the maths question — please try again.';
+      statusEl.className = 'form-status error';
+      document.getElementById('cf-challenge').focus();
+      return;
+    }
+
+    if (!name || !email || !message) {
+      statusEl.textContent = 'Please fill in all required fields.';
+      statusEl.className = 'form-status error';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+    if (statusEl) { statusEl.className = 'form-status'; statusEl.textContent = ''; }
+
+    try {
+      const res  = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, company, email, message }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        form.style.display = 'none';
+        if (doneEl) doneEl.hidden = false;
+        if (doneClose) setTimeout(() => doneClose.focus(), 50);
+      } else {
+        statusEl.textContent = data.detail || 'Something went wrong — please try again.';
+        statusEl.className = 'form-status error';
+      }
+    } catch {
+      statusEl.textContent = 'Connection error — please try again.';
+      statusEl.className = 'form-status error';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Send message';
+    }
+  });
+})();
+
 /* ── Wire up forms ─────────────────────────────────────── */
 document.querySelectorAll('.subscribe-form').forEach(f =>
   f.addEventListener('submit', handleSubscribe)
