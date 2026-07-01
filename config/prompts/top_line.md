@@ -10,10 +10,6 @@ company, Service or capability names. Lead with the answer. No preamble, no head
 If any two adjacent bullets describe closely related aspects of the same event or story,
 merge them into a single bullet. This may result in fewer than 5 bullets.
 
-After each bullet, on the same line, append the primary source name in parentheses using
-this exact HTML: <span style="font-size:10px;color:#999;">(Source Name)</span>
-Replace "Source Name" with the actual source from the items list below.
-
 Return ONLY the bullets, one per line, each starting with "- ". Nothing else.
 
 Today's selected items (ranked):
