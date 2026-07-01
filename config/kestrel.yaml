@@ -12,7 +12,7 @@ run:
   lookback_hours:
     morning: 18
     afternoon: 6
-  shipped_suppression_days: 5
+  shipped_suppression_days: 14
 synthesis:
   provider: "anthropic"
   model: "claude-opus-4-8"            # enrich_item, top_line, watchpoints

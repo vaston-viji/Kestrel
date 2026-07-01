@@ -1,6 +1,7 @@
 """Orchestrates a full Kestrel run across all 12 stages."""
 from __future__ import annotations
 import hashlib
+import html as _html
 import json
 import logging
 import random
@@ -51,6 +52,76 @@ _SPECIFICITY_RE = re.compile(
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
+def _infer_date_from_url(url: str) -> "datetime | None":
+    """Infer a publish date from URL path patterns like /2025/06/30/ or /2025-06-30."""
+    # Full date: /YYYY/MM/DD/ or -YYYY-MM-DD
+    m = re.search(r'[/\-](\d{4})[/\-](\d{1,2})[/\-](\d{1,2})(?:[/\-]|$)', url)
+    if m:
+        y, mo, d = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        if 2000 <= y <= 2030 and 1 <= mo <= 12 and 1 <= d <= 31:
+            try:
+                return datetime(y, mo, d, tzinfo=timezone.utc)
+            except ValueError:
+                pass
+    # Year only: /2025/ — treat as Jan 1, conservative (likely old if not current year)
+    m = re.search(r'/(\d{4})/', url)
+    if m:
+        y = int(m.group(1))
+        if 2000 <= y <= 2030:
+            return datetime(y, 1, 1, tzinfo=timezone.utc)
+    return None
+
+
+def _clean_title(raw: str) -> str:
+    """Unescape HTML entities and strip trailing RSS source-name suffixes."""
+    t = _html.unescape(raw)
+    # Many RSS feeds append "  Source Name" — strip before collapsing whitespace
+    t = re.sub(r'[\s\xa0]{2,}[A-Z][\w .&\'-]{2,}$', '', t)
+    # Collapse all whitespace (including non-breaking spaces) to a single space
+    return re.sub(r'[\s\xa0]+', ' ', t).strip()
+
+
+def _fetch_published_date(url: str, timeout: int = 10) -> "datetime | None":
+    """Fetch article page and extract publication date from HTML/JSON-LD metadata.
+
+    Called only for primary/official sources where no date could be inferred from
+    the URL, so that old evergreen articles in RSS feeds are filtered out correctly.
+    """
+    try:
+        import httpx
+        r = httpx.get(
+            url, timeout=timeout, follow_redirects=True, verify=False,
+            headers={"User-Agent": "Mozilla/5.0 (compatible; KestrelBot/1.0)"},
+        )
+        if r.status_code != 200:
+            return None
+        html = r.text
+        # JSON-LD / inline JSON: "datePublished":"2026-04-08T..."
+        m = re.search(r'"datePublished"\s*:\s*"([\d]{4}-[\d]{2}-[\d]{2}[T ][\d:Z.+-]*)"', html)
+        if not m:
+            # <meta property="article:published_time" content="...">
+            m = re.search(
+                r'<meta[^>]+(?:property|name)=["\']article:published_time["\'][^>]+content=["\']([^"\']+)["\']',
+                html, re.IGNORECASE,
+            )
+        if not m:
+            m = re.search(
+                r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+(?:property|name)=["\']article:published_time["\']',
+                html, re.IGNORECASE,
+            )
+        if not m:
+            # <time datetime="2026-04-08">
+            m = re.search(r'<time[^>]+datetime=["\'](\d{4}-\d{2}-\d{2})', html, re.IGNORECASE)
+        if m:
+            date_str = m.group(1)[:10]  # keep YYYY-MM-DD
+            y, mo, d = map(int, date_str.split("-"))
+            if 2000 <= y <= 2035 and 1 <= mo <= 12 and 1 <= d <= 31:
+                return datetime(y, mo, d, tzinfo=timezone.utc)
+    except Exception:
+        pass
+    return None
+
 
 def _now_sydney(cfg: AppConfig) -> datetime:
     tz = zoneinfo.ZoneInfo(cfg.timezone)
@@ -402,6 +473,19 @@ def _pick_quote(quotes: list[dict], items: list[ScoredItem],
 # ---------------------------------------------------------------------------
 
 _INSUFFICIENT_MARKER = "INSUFFICIENT SOURCE DETAIL"
+_BRIEF_INSUFFICIENT_MARKER = "Details pending"
+
+_GNEWS_STOPWORDS = {
+    'the','a','an','and','or','but','in','on','at','to','for','of','with',
+    'by','from','up','is','was','are','were','be','been','its','it','this',
+    'that','as','into','over','after','s',
+}
+
+
+def _gnews_query(title: str, max_words: int = 8) -> str:
+    """Build a focused GNews query by stripping stopwords from the item title."""
+    words = [w for w in re.split(r'\W+', title) if w and w.lower() not in _GNEWS_STOPWORDS]
+    return ' '.join(words[:max_words])
 
 
 def _fix_insufficient_items(
@@ -410,10 +494,11 @@ def _fix_insufficient_items(
     synth,
     style: str,
 ) -> list[BriefItem]:
-    """For priority items where synthesis found only a headline, try a GNews search.
+    """For items where synthesis found only a headline, try a GNews search.
 
-    If a better snippet is found, re-enriches the item.
-    If nothing is found, drops the item from priority.
+    Covers both full priority items (INSUFFICIENT SOURCE DETAIL marker) and
+    brief items (Details pending marker). If a better snippet is found the item
+    is re-enriched; if nothing is found the item is dropped from priority.
     """
     from kestrel.collectors.google_news import GoogleNewsCollector
     from kestrel.models import Source as _Source
@@ -422,15 +507,18 @@ def _fix_insufficient_items(
     gnews = GoogleNewsCollector(timeout=15)
 
     for bi in items:
-        if _INSUFFICIENT_MARKER not in bi.narrative.what_happened:
+        is_full_insufficient = _INSUFFICIENT_MARKER in bi.narrative.what_happened
+        is_brief_insufficient = bi.is_summary and _BRIEF_INSUFFICIENT_MARKER in bi.narrative.what_happened
+
+        if not is_full_insufficient and not is_brief_insufficient:
             result.append(bi)
             continue
 
-        log.info("Insufficient source detail for '%s' — attempting GNews fallback",
+        log.info("Insufficient detail for '%s' — attempting GNews fallback",
                  bi.scored.title[:60])
 
-        # Build a dummy source with the item title as a gnews query
-        query = bi.scored.title[:120]
+        # Use a focused query (key terms, no stopwords) for better GNews precision
+        query = _gnews_query(bi.scored.title)
         dummy = _Source(
             name=bi.scored.source_name, type="GNEWS",
             sector="", adjacent_domain="", active=True,
@@ -452,23 +540,30 @@ def _fix_insufficient_items(
             log.info("No GNews results for '%s' — dropping from priority", bi.scored.title[:60])
             continue
 
-        # Use the best snippet from the GNews results to re-enrich
-        best = max(found, key=lambda r: len(r.snippet))
-        if len(best.snippet) > len(bi.scored.snippet or ""):
+        # Use the richest snippet found
+        best = max(found, key=lambda r: len(r.snippet or ""))
+        if len(best.snippet or "") > len(bi.scored.snippet or ""):
             bi.scored.snippet = best.snippet
             log.info("Re-enriching '%s' with GNews snippet (%d chars)",
                      bi.scored.title[:60], len(best.snippet))
             try:
-                bi.narrative = synth.enrich_item(bi.scored, style)
-                if _INSUFFICIENT_MARKER in bi.narrative.what_happened:
+                if bi.is_summary:
+                    bi.narrative = synth.enrich_item_brief(bi.scored, style)
+                    still_bad = _BRIEF_INSUFFICIENT_MARKER in bi.narrative.what_happened
+                else:
+                    bi.narrative = synth.enrich_item(bi.scored, style)
+                    still_bad = _INSUFFICIENT_MARKER in bi.narrative.what_happened
+                if still_bad:
                     log.info("Still insufficient after GNews — dropping '%s'",
                              bi.scored.title[:60])
                     continue
             except Exception as exc:
                 log.warning("Re-enrich failed for '%s': %s", bi.scored.title[:60], exc)
                 continue
-
-        result.append(bi)
+            result.append(bi)
+        else:
+            log.info("GNews snippet no richer — dropping '%s'", bi.scored.title[:60])
+            continue
 
     return result
 
@@ -521,13 +616,46 @@ def run(slot: str, cfg: AppConfig, db: KestrelDB) -> dict[str, Any]:
     # ── Stage 4: normalise + window filter ──────────────────────────────────
     t0 = time.time()
     windowed: list[RawItem] = []
+    dropped_undated = 0
     for item in raw_items:
         item.url = _normalise_url(item.url)
-        item.title = re.sub(r"\s+", " ", item.title).strip()
+        item.title = _clean_title(item.title)
+
+        # Infer publish date from URL path when the collector couldn't provide one
+        if item.published_at is None:
+            item.published_at = _infer_date_from_url(item.url)
+
+        # Drop items outside the collection window
         if item.published_at and item.published_at < window.start:
             continue
+
+        # Drop undated items from non-primary / non-official sources — freshness unknown
+        if item.published_at is None:
+            src_obj = sources_by_name.get(item.source_name)
+            is_trusted = src_obj and (
+                src_obj.official_status.lower() == "official"
+                or src_obj.primary_or_secondary.lower() == "primary"
+            )
+            if not is_trusted:
+                dropped_undated += 1
+                log.debug("Dropped undated item from '%s': %s",
+                          item.source_name, item.title[:60])
+                continue
+            # Trusted source but still no date — try fetching page metadata.
+            # Many think-tanks keep old articles in their RSS forever; a stale
+            # datePublished in the HTML lets us filter them out here.
+            fetched_date = _fetch_published_date(item.url)
+            if fetched_date is not None:
+                item.published_at = fetched_date
+                log.debug("Metadata date for '%s': %s", item.title[:60], fetched_date.date())
+                if item.published_at < window.start:
+                    log.info("Dropped old item (metadata date %s) from '%s': %s",
+                             fetched_date.date(), item.source_name, item.title[:60])
+                    continue
+
         windowed.append(item)
-    log.info("Stage 4: %d items after window filter", len(windowed))
+    log.info("Stage 4: %d items after window filter (%d undated non-primary dropped)",
+             len(windowed), dropped_undated)
     timings["normalise"] = time.time() - t0
 
     # ── Stage 5: dedupe ─────────────────────────────────────────────────────
@@ -626,8 +754,9 @@ def run(slot: str, cfg: AppConfig, db: KestrelDB) -> dict[str, Any]:
     full_priority = _enrich_priority(priority_scored[:4])
     brief_priority = _enrich_brief(priority_scored[4:8])
 
-    # Web-search fallback for items with insufficient source detail
+    # Web-search fallback for items with insufficient source detail (full and brief)
     full_priority = _fix_insufficient_items(full_priority, window, synth, style)
+    brief_priority = _fix_insufficient_items(brief_priority, window, synth, style)
 
     priority_items = full_priority + brief_priority
     policy_items = _body_items(policy_scored)
