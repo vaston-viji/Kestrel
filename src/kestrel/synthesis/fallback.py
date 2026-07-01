@@ -1,8 +1,37 @@
 """FallbackSynthesizer — no model calls; keyword-based classify; digest.md output."""
 from __future__ import annotations
+import html
 import re
 
 from kestrel.models import Classification, ItemNarrative, RawItem, ScoredItem, Taxonomy
+
+
+def _clean_extract(snippet: str, title: str, max_chars: int = 240) -> str:
+    """Best-effort succinct 'what happened' when no model is available.
+
+    Unescapes entities, collapses whitespace, drops a Google-News source suffix and
+    a leading byline, then keeps the first sentence or two. Falls back to the title
+    when the snippet is too thin to be useful (e.g. a bare byline).
+    """
+    s = html.unescape(snippet or "").replace("\xa0", " ")
+    # Google News appends "<2+ spaces>Source Name" after the headline — strip it
+    # before collapsing whitespace, while the double-space marker still exists.
+    s = re.sub(r"\s{2,}[A-Z][\w .&'-]+$", "", s)
+    s = re.sub(r"\s+", " ", s).strip()
+    # A bare byline ("ByDr Smith, Jane Doe") is not a summary — prefer the title.
+    if re.match(r"^By[\s:]?[A-Z]", s) and "." not in s:
+        return (title or "").strip()
+    # Drop a leading byline that precedes real prose.
+    s = re.sub(r"^By[\s:]*[A-Z][\w .,'-]{0,80}?(?=[A-Z][a-z]+\s+[a-z])", "", s).strip()
+    if len(s) < 25:
+        return (title or "").strip()
+    sentences = re.split(r"(?<=[.!?])\s+", s)
+    out = ""
+    for sent in sentences:
+        if out and len(out) + len(sent) + 1 > max_chars:
+            break
+        out = f"{out} {sent}".strip()
+    return out or (title or "").strip()
 
 # ---------------------------------------------------------------------------
 # Domain → section mapping
@@ -117,9 +146,17 @@ class FallbackSynthesizer:
 
     def enrich_item(self, item: ScoredItem, style: str) -> ItemNarrative:
         return ItemNarrative(
-            what_happened=item.snippet or item.title,
-            why_it_matters="[[PASTE FROM CLAUDE — why does this matter for Australian Defence?]]",
-            kestrel_angle="[[PASTE FROM CLAUDE — what is the Kestrel Angle for Defence and sovereign industry?]]",
+            what_happened=_clean_extract(item.snippet, item.title),
+            why_it_matters=(
+                "[[PASTE FROM CLAUDE — one or two sentences (~40 words): the strategic "
+                "significance for Australian Defence — capability, force posture, "
+                "sovereignty, schedule or cost, allied alignment, or industrial base]]"
+            ),
+            kestrel_angle=(
+                "[[PASTE FROM CLAUDE — one or two sentences (~35 words): the sharp, "
+                "non-obvious read — second-order effect, a risk or opportunity others "
+                "miss, or what to watch next]]"
+            ),
         )
 
     def watchpoints(self, items: list[ScoredItem], style: str) -> list[str]:
