@@ -11,6 +11,7 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse as _urlparse
 
 import zoneinfo
 from collections import Counter
@@ -620,6 +621,12 @@ def run(slot: str, cfg: AppConfig, db: KestrelDB) -> dict[str, Any]:
     for item in raw_items:
         item.url = _normalise_url(item.url)
         item.title = _clean_title(item.title)
+
+        # Drop root-domain URLs — these are site homepages, not news articles
+        _parsed_path = _urlparse(item.url).path.rstrip("/")
+        if not _parsed_path:
+            log.debug("Dropped root URL: %s", item.url)
+            continue
 
         # Infer publish date from URL path when the collector couldn't provide one
         if item.published_at is None:

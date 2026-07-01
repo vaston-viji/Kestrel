@@ -12,6 +12,7 @@ from kestrel.config import load_config
 from kestrel.models import (
     Brief, BriefItem, Classification, ItemNarrative, ScoredItem,
 )
+from kestrel.pipeline import _load_austender_contracts
 from kestrel.render.html import render_html
 from kestrel.render.subject import make_subject
 from kestrel.store.db import KestrelDB
@@ -109,6 +110,12 @@ def _load_brief_from_db(db: KestrelDB, slot: str, output_dir: Path) -> tuple[Bri
             confidence=confidence or "medium",
             corroborating_sources=corr_map.get(item_id, []),
         )
+        # Brief priority items (positions 5-8) have no why_it_matters or kestrel_angle
+        is_summary = (
+            section == "priority"
+            and not (why_matters or "").strip()
+            and not (kestrel_angle or "").strip()
+        )
         bi = BriefItem(
             scored=si,
             narrative=ItemNarrative(
@@ -118,6 +125,7 @@ def _load_brief_from_db(db: KestrelDB, slot: str, output_dir: Path) -> tuple[Bri
                 kestrel_angle=kestrel_angle or "",
             ),
             section=section or "",
+            is_summary=is_summary,
         )
         if section == "priority":
             priority.append(bi)
@@ -148,6 +156,7 @@ def _load_brief_from_db(db: KestrelDB, slot: str, output_dir: Path) -> tuple[Bri
         watchpoints=watchpoints,
         digest_md="",
         subject=subject,
+        austender_contracts=[],
     )
     return brief, run_date
 
@@ -171,6 +180,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     brief, run_date = result
+    brief.austender_contracts = _load_austender_contracts(cfg)
     html = render_html(brief, cfg.paths.assets_dir, cfg.brief.theme, root)
 
     out_dir = cfg.paths.output_dir / run_date
