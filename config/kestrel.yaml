@@ -15,7 +15,7 @@ run:
   shipped_suppression_days: 5
 synthesis:
   provider: "anthropic"
-  model: "claude-sonnet-4-6"          # enrich_item, top_line, watchpoints
+  model: "claude-opus-4-8"            # enrich_item, top_line, watchpoints
   classify_model: "claude-haiku-4-5-20251001"  # bulk classification (~80% of calls)
   max_retries: 3
 brief:
