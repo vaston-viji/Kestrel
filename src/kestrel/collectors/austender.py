@@ -10,6 +10,7 @@ Prerequisites:
 from __future__ import annotations
 import logging
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -87,6 +88,8 @@ def _extract_boxes(driver: webdriver.Chrome) -> list[dict]:
                         pass
                 elif label == "Agency":
                     data["agency"] = inner.text.strip()
+                elif label == "Publish Date":
+                    data["publish_date"] = inner.text.strip()
                 elif label == "Contract Value (AUD)":
                     data["value_text"] = inner.text.strip()
                     data["value"] = _parse_value(inner.text) or 0
@@ -244,11 +247,21 @@ class AusTenderCollector:
                 value = d.get("value", 0)
                 value_text = d.get("value_text", "")
                 snippet = f"[{cn_id}] {agency} | Supplier: {supplier} | Value: {value_text}"
+                publish_date_str = d.get("publish_date", "")
+                publish_date_iso = ""
+                published_at = None
+                if publish_date_str:
+                    try:
+                        dt = datetime.strptime(publish_date_str, "%d-%b-%Y").replace(tzinfo=timezone.utc)
+                        published_at = dt
+                        publish_date_iso = dt.strftime("%Y-%m-%d")
+                    except ValueError:
+                        pass
                 items.append(RawItem(
                     title=title,
                     url=url,
                     source_name=source.name,
-                    published_at=None,
+                    published_at=published_at,
                     snippet=snippet,
                     raw_meta={
                         "cn_id": cn_id,
@@ -256,6 +269,7 @@ class AusTenderCollector:
                         "supplier": supplier,
                         "value": value,
                         "contact_name": d.get("contact_name", ""),
+                        "publish_date": publish_date_iso,
                     },
                 ))
 

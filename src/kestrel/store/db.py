@@ -57,9 +57,17 @@ CREATE TABLE IF NOT EXISTS url_seen (
     headline    TEXT
 );
 
+CREATE TABLE IF NOT EXISTS quotes_used (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    quote_hash  TEXT NOT NULL,
+    run_id      TEXT NOT NULL,
+    used_at     TEXT NOT NULL
+);
+
 CREATE INDEX IF NOT EXISTS idx_items_run      ON items(run_id);
 CREATE INDEX IF NOT EXISTS idx_items_date     ON items(created_at);
 CREATE INDEX IF NOT EXISTS idx_runs_date_slot ON runs(run_date, slot);
+CREATE INDEX IF NOT EXISTS idx_quotes_used_at ON quotes_used(used_at);
 """
 
 
@@ -204,6 +212,27 @@ class KestrelDB:
             (slot, limit),
         ).fetchall()
         return [r[0] for r in rows]
+
+    # ------------------------------------------------------------------
+    # Quote history
+    # ------------------------------------------------------------------
+
+    def record_quote_used(self, run_id: str, quote_text: str) -> None:
+        h = hashlib.sha256(quote_text.encode()).hexdigest()
+        self._conn.execute(
+            "INSERT INTO quotes_used (quote_hash, run_id, used_at) VALUES (?,?,?)",
+            (h, run_id, datetime.utcnow().isoformat()),
+        )
+        self._conn.commit()
+
+    def recently_used_quote_hashes(self, n: int = 90) -> set[str]:
+        """Return quote hashes used in the last n runs (across all slots)."""
+        rows = self._conn.execute(
+            "SELECT DISTINCT quote_hash FROM quotes_used "
+            "ORDER BY used_at DESC LIMIT ?",
+            (n,),
+        ).fetchall()
+        return {r[0] for r in rows}
 
     def last_finished_at(self, slot: str) -> Optional[datetime]:
         """Return the finished_at timestamp of the most recent completed run for this slot."""

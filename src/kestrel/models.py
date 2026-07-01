@@ -60,6 +60,7 @@ class Taxonomy:
 
 @dataclass
 class ItemNarrative:
+    headline: str          # AI-synthesised title, <12 words
     what_happened: str
     why_it_matters: str
     kestrel_angle: str
@@ -90,6 +91,7 @@ class BriefItem:
     scored: ScoredItem
     narrative: ItemNarrative
     section: str                 # email section this item lands in
+    is_summary: bool = False     # True for brief items 5-8 (headline + sentence only)
 
 
 @dataclass
@@ -102,6 +104,7 @@ class AusTenderContract:
     value: int                   # integer dollars
     description: str             # ≤10 word summary
     contact_name: str = ""       # contact officer from contract notice
+    publish_date: str = ""       # ISO date string YYYY-MM-DD from AusTender
 
 
 @dataclass

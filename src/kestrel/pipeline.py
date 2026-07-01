@@ -211,6 +211,10 @@ def _compute_confidence(item: ScoredItem, sources_by_name: dict[str, Source]) ->
         age_hours = (datetime.now(timezone.utc) - item.published_at).total_seconds() / 3600
         if age_hours > 36:
             return "low"
+    else:
+        # No date from non-official source → treat as low confidence
+        if not (src and src.official_status.lower() == "official"):
+            return "low"
 
     # Downgrade vague items: no named person, figure, or year → likely unverifiable commentary
     combined = f"{item.title} {item.snippet or ''}"
@@ -251,8 +255,12 @@ def _allocate(
         above_min = sorted(scored, key=lambda i: i.rating_total, reverse=True)[:10]
     ranked = sorted(above_min, key=lambda i: i.rating_total, reverse=True)
 
-    # Priority: escalated first, then highest rated, cap max_priority_items
-    priority_candidates = sorted(ranked, key=lambda i: (-int(i.escalated), -i.rating_total))
+    # Priority: escalated first, then date-known items, then highest rated, cap max_priority_items
+    priority_candidates = sorted(ranked, key=lambda i: (
+        -int(i.escalated),
+        -int(i.published_at is not None),  # prefer items with known dates
+        -i.rating_total,
+    ))
     priority_items = priority_candidates[:f.max_priority_items]
 
     # Remaining items for body (not already in priority)
@@ -361,15 +369,108 @@ def _dominant_quote_theme(items: list[ScoredItem]) -> str:
     return counts.most_common(1)[0][0]
 
 
-def _pick_quote(quotes: list[dict], items: list[ScoredItem]) -> tuple[str, str]:
-    """Choose a random quote whose theme matches the dominant content, with fallback."""
+def _pick_quote(quotes: list[dict], items: list[ScoredItem],
+                db: "KestrelDB | None" = None) -> tuple[str, str]:
+    """Choose a random quote matching dominant content, excluding the last 90 runs."""
     if not quotes:
         return ("", "")
+    used_hashes: set[str] = set()
+    if db is not None:
+        used_hashes = db.recently_used_quote_hashes(90)
+
+    import hashlib as _hashlib
+    def _qhash(q: dict) -> str:
+        return _hashlib.sha256(q["quote"].encode()).hexdigest()
+
     theme = _dominant_quote_theme(items)
     themed = [q for q in quotes if q.get("theme", "general") == theme]
-    pool = themed if len(themed) >= 3 else quotes   # fall back to full pool if thin
-    q = random.choice(pool)
+    pool = themed if len(themed) >= 3 else quotes
+
+    # Exclude recently used; fall back to full pool if exclusion empties it
+    fresh = [q for q in pool if _qhash(q) not in used_hashes]
+    if not fresh:
+        fresh = [q for q in quotes if _qhash(q) not in used_hashes]
+    if not fresh:
+        fresh = pool  # all quotes exhausted — allow repeats
+
+    q = random.choice(fresh)
     return (q["quote"], q["author"])
+
+
+# ---------------------------------------------------------------------------
+# Web-search fallback for insufficient-source priority items
+# ---------------------------------------------------------------------------
+
+_INSUFFICIENT_MARKER = "INSUFFICIENT SOURCE DETAIL"
+
+
+def _fix_insufficient_items(
+    items: list[BriefItem],
+    window: "Window",
+    synth,
+    style: str,
+) -> list[BriefItem]:
+    """For priority items where synthesis found only a headline, try a GNews search.
+
+    If a better snippet is found, re-enriches the item.
+    If nothing is found, drops the item from priority.
+    """
+    from kestrel.collectors.google_news import GoogleNewsCollector
+    from kestrel.models import Source as _Source
+
+    result: list[BriefItem] = []
+    gnews = GoogleNewsCollector(timeout=15)
+
+    for bi in items:
+        if _INSUFFICIENT_MARKER not in bi.narrative.what_happened:
+            result.append(bi)
+            continue
+
+        log.info("Insufficient source detail for '%s' — attempting GNews fallback",
+                 bi.scored.title[:60])
+
+        # Build a dummy source with the item title as a gnews query
+        query = bi.scored.title[:120]
+        dummy = _Source(
+            name=bi.scored.source_name, type="GNEWS",
+            sector="", adjacent_domain="", active=True,
+            url="https://news.google.com",
+            linkedin_url="", asx_ticker="",
+            primary_or_secondary="secondary",
+            official_status="", trust_score=2.0, signal_score=2.0,
+            noise_score=3.0, priority_tier=3,
+            include_morning=True, include_afternoon=True,
+            notes=f"gnews: {query}",
+        )
+        try:
+            found = gnews.collect(dummy, window)
+        except Exception as exc:
+            log.warning("GNews fallback failed for '%s': %s", bi.scored.title[:60], exc)
+            found = []
+
+        if not found:
+            log.info("No GNews results for '%s' — dropping from priority", bi.scored.title[:60])
+            continue
+
+        # Use the best snippet from the GNews results to re-enrich
+        best = max(found, key=lambda r: len(r.snippet))
+        if len(best.snippet) > len(bi.scored.snippet or ""):
+            bi.scored.snippet = best.snippet
+            log.info("Re-enriching '%s' with GNews snippet (%d chars)",
+                     bi.scored.title[:60], len(best.snippet))
+            try:
+                bi.narrative = synth.enrich_item(bi.scored, style)
+                if _INSUFFICIENT_MARKER in bi.narrative.what_happened:
+                    log.info("Still insufficient after GNews — dropping '%s'",
+                             bi.scored.title[:60])
+                    continue
+            except Exception as exc:
+                log.warning("Re-enrich failed for '%s': %s", bi.scored.title[:60], exc)
+                continue
+
+        result.append(bi)
+
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -498,16 +599,22 @@ def run(slot: str, cfg: AppConfig, db: KestrelDB) -> dict[str, Any]:
                                cfg.audience.top_line_max_words)
     watchpoints_bullets = synth.watchpoints(all_selected, style)
 
-    quote = _pick_quote(cfg.quotes, priority_scored + policy_scored)
+    quote = _pick_quote(cfg.quotes, priority_scored + policy_scored, db=db)
 
     def _enrich_priority(items: list[ScoredItem]) -> list[BriefItem]:
         return [BriefItem(scored=i, narrative=synth.enrich_item(i, style), section="")
+                for i in items]
+
+    def _enrich_brief(items: list[ScoredItem]) -> list[BriefItem]:
+        return [BriefItem(scored=i, narrative=synth.enrich_item_brief(i, style),
+                          section="", is_summary=True)
                 for i in items]
 
     def _body_items(items: list[ScoredItem]) -> list[BriefItem]:
         return [BriefItem(
             scored=i,
             narrative=ItemNarrative(
+                headline="",
                 what_happened=i.snippet or i.title,
                 why_it_matters="",
                 kestrel_angle="",
@@ -515,7 +622,14 @@ def run(slot: str, cfg: AppConfig, db: KestrelDB) -> dict[str, Any]:
             section="",
         ) for i in items]
 
-    priority_items = _enrich_priority(priority_scored)
+    # Full detail for top 4, brief headline+sentence for items 5-8
+    full_priority = _enrich_priority(priority_scored[:4])
+    brief_priority = _enrich_brief(priority_scored[4:8])
+
+    # Web-search fallback for items with insufficient source detail
+    full_priority = _fix_insufficient_items(full_priority, window, synth, style)
+
+    priority_items = full_priority + brief_priority
     policy_items = _body_items(policy_scored)
     market_items = _body_items(market_scored)
     tech_items = _body_items(tech_scored)
@@ -534,8 +648,12 @@ def run(slot: str, cfg: AppConfig, db: KestrelDB) -> dict[str, Any]:
     log.info("Stage 9: synthesis complete")
     timings["synthesise"] = time.time() - t0
 
+    # Persist which quote was used (for 90-run exclusion)
+    if quote and quote[0]:
+        db.record_quote_used(run_id, quote[0])
+
     # ── Stage 9.5: AusTender contracts ──────────────────────────────────────
-    austender_contracts = _load_austender_contracts(cfg)
+    austender_contracts = _load_austender_contracts(cfg, window=window)
 
     # ── Stage 10: render ─────────────────────────────────────────────────────
     t0 = time.time()
@@ -679,12 +797,14 @@ def _agency_matches_filter(agency: str, filter_names: list[str]) -> bool:
 _AUSTENDER_AGENCY_EXCLUDE = {"australian criminal intelligence"}
 
 
-def _load_austender_contracts(cfg: AppConfig, max_age_hours: int = 23) -> list:
+def _load_austender_contracts(cfg: AppConfig, max_age_hours: int = 23,
+                               window: "Window | None" = None) -> list:
     """Load the most recent AusTender scan from cache, or run a fresh scan.
 
     Cache file: data/austender_cache.json
     Re-scans if the cache is older than max_age_hours (default 23 hours).
     Filters to Defence-related agencies from the AusTender_Agencies sheet.
+    Filters contracts to those published within the run window.
     Returns list[AusTenderContract] sorted by value desc, capped at 10.
     """
     agency_filter = [
@@ -692,6 +812,12 @@ def _load_austender_contracts(cfg: AppConfig, max_age_hours: int = 23) -> list:
         if a["name"].lower() not in _AUSTENDER_AGENCY_EXCLUDE
     ]
     cache_path = cfg.paths.data_dir / "austender_cache.json"
+    window_start_iso = window.start.strftime("%Y-%m-%d") if window else None
+
+    def _date_in_window(c: AusTenderContract) -> bool:
+        if not window_start_iso or not c.publish_date:
+            return True  # no date info — include to avoid empty section
+        return c.publish_date >= window_start_iso
 
     # Try to load from cache — filter is applied at load time so stale agency
     # lists still work correctly against a fresh cache.
@@ -704,24 +830,24 @@ def _load_austender_contracts(cfg: AppConfig, max_age_hours: int = 23) -> list:
             ).total_seconds() / 3600
             if age_hours <= max_age_hours:
                 log.info("AusTender: using cached scan (%.1f h old)", age_hours)
-                all_cached = [AusTenderContract(**c) for c in raw["contracts"]]
+                all_cached = [AusTenderContract(**{k: v for k, v in c.items()
+                                                   if k in AusTenderContract.__dataclass_fields__})
+                              for c in raw["contracts"]]
+                candidates = all_cached
                 if agency_filter:
-                    filtered = [
-                        c for c in all_cached
-                        if _agency_matches_filter(c.agency, agency_filter)
-                    ]
-                    log.info(
-                        "AusTender: %d/%d contracts match agency filter",
-                        len(filtered), len(all_cached),
-                    )
-                    return sorted(filtered, key=lambda c: c.value, reverse=True)[:10]
-                return sorted(all_cached, key=lambda c: c.value, reverse=True)[:10]
+                    candidates = [c for c in candidates if _agency_matches_filter(c.agency, agency_filter)]
+                candidates = [c for c in candidates if _date_in_window(c)]
+                log.info(
+                    "AusTender: %d contracts after agency+date filter (window_start=%s)",
+                    len(candidates), window_start_iso,
+                )
+                return sorted(candidates, key=lambda c: c.value, reverse=True)[:10]
             else:
                 log.info("AusTender: cache stale (%.1f h) — rescanning", age_hours)
         except Exception as exc:
             log.warning("AusTender: cache read error (%s) — rescanning", exc)
 
-    # Run a fresh scan (past 7 days)
+    # Run a fresh scan scoped to the run window (min 1 day lookback)
     try:
         from kestrel.collectors.austender import AusTenderCollector
         dummy_source = Source(
@@ -733,11 +859,15 @@ def _load_austender_contracts(cfg: AppConfig, max_age_hours: int = 23) -> list:
             include_afternoon=True, notes="",
         )
         end = datetime.now(timezone.utc)
-        start = end - timedelta(days=7)
-        window = Window(start=start, end=end)
+        if window:
+            # Use the run window but enforce a minimum 1-day lookback
+            scan_start = min(window.start, end - timedelta(days=1))
+        else:
+            scan_start = end - timedelta(days=7)
+        scan_window = Window(start=scan_start, end=end)
         raw_items = AusTenderCollector(
             timeout=60, min_value=cfg.filters.austender_min_award_value
-        ).collect(dummy_source, window)
+        ).collect(dummy_source, scan_window)
 
         # Cache ALL results (pre-filter) so agency list changes don't require a rescan
         all_items = sorted(
@@ -755,19 +885,17 @@ def _load_austender_contracts(cfg: AppConfig, max_age_hours: int = 23) -> list:
                 value=i.raw_meta["value"],
                 description=_short_description(i.title),
                 contact_name=i.raw_meta.get("contact_name", ""),
+                publish_date=i.raw_meta.get("publish_date", ""),
             )
             for i in all_items
         ]
 
-        # Determine the display selection first (Defence-agency filter, top 10 by value)
+        # Determine the display selection (Defence-agency filter + date window, top 10 by value)
+        candidates = all_contract_objs
         if agency_filter:
-            filtered = [
-                c for c in all_contract_objs
-                if _agency_matches_filter(c.agency, agency_filter)
-            ]
-        else:
-            filtered = all_contract_objs
-        selection = sorted(filtered, key=lambda c: c.value, reverse=True)[:10]
+            candidates = [c for c in candidates if _agency_matches_filter(c.agency, agency_filter)]
+        candidates = [c for c in candidates if _date_in_window(c)]
+        selection = sorted(candidates, key=lambda c: c.value, reverse=True)[:10]
 
         # Enrich ONLY the displayed selection with the contact officer — the search
         # listing omits it, so we follow each contract's detail page. These objects
@@ -790,6 +918,7 @@ def _load_austender_contracts(cfg: AppConfig, max_age_hours: int = 23) -> list:
                         "agency": c.agency, "supplier": c.supplier,
                         "value": c.value, "description": c.description,
                         "contact_name": c.contact_name,
+                        "publish_date": c.publish_date,
                     }
                     for c in all_contract_objs
                 ],

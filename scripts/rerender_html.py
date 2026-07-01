@@ -112,6 +112,7 @@ def _load_brief_from_db(db: KestrelDB, slot: str, output_dir: Path) -> tuple[Bri
         bi = BriefItem(
             scored=si,
             narrative=ItemNarrative(
+                headline="",
                 what_happened=what_happened or "",
                 why_it_matters=why_matters or "",
                 kestrel_angle=kestrel_angle or "",

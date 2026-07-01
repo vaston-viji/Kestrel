@@ -160,6 +160,7 @@ class AnthropicSynthesizer:
             raw = self._call(prompt, max_tokens=512)
             data = _extract_json(raw)
             return ItemNarrative(
+                headline=str(data.get("headline", "")),
                 what_happened=str(data.get("what_happened", item.snippet or item.title)),
                 why_it_matters=str(data.get("why_it_matters", "")),
                 kestrel_angle=str(data.get("kestrel_angle", "")),
@@ -168,6 +169,24 @@ class AnthropicSynthesizer:
             log.warning("enrich_item fallback for '%s': %s", item.title[:60], exc)
             from kestrel.synthesis.fallback import FallbackSynthesizer
             return FallbackSynthesizer().enrich_item(item, style)
+
+    def enrich_item_brief(self, item: ScoredItem, style: str) -> ItemNarrative:
+        template = _load_prompt("priority_item_brief", self._root)
+        prompt = template.replace("{{WRITING_STYLE}}", style) \
+                         .replace("{{ITEM}}", _item_context(item))
+        try:
+            raw = self._call(prompt, max_tokens=256)
+            data = _extract_json(raw)
+            return ItemNarrative(
+                headline=str(data.get("headline", "")),
+                what_happened=str(data.get("summary", item.snippet or item.title)),
+                why_it_matters="",
+                kestrel_angle="",
+            )
+        except Exception as exc:
+            log.warning("enrich_item_brief fallback for '%s': %s", item.title[:60], exc)
+            from kestrel.synthesis.fallback import FallbackSynthesizer
+            return FallbackSynthesizer().enrich_item_brief(item, style)
 
     def watchpoints(self, items: list[ScoredItem], style: str) -> list[str]:
         template = _load_prompt("watchpoints", self._root)

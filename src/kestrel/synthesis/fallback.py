@@ -145,10 +145,13 @@ class FallbackSynthesizer:
         return bullets
 
     def enrich_item(self, item: ScoredItem, style: str) -> ItemNarrative:
+        words = item.title.split()
+        headline = " ".join(words[:12]) + ("…" if len(words) > 12 else "")
         return ItemNarrative(
+            headline=headline,
             what_happened=_clean_extract(item.snippet, item.title),
             why_it_matters=(
-                "[[PASTE FROM CLAUDE — one or two sentences (~40 words): the strategic "
+                "[[PASTE FROM CLAUDE — one sentence under 25 words: the strategic "
                 "significance for Australian Defence — capability, force posture, "
                 "sovereignty, schedule or cost, allied alignment, or industrial base]]"
             ),
@@ -157,6 +160,17 @@ class FallbackSynthesizer:
                 "non-obvious read — second-order effect, a risk or opportunity others "
                 "miss, or what to watch next]]"
             ),
+        )
+
+    def enrich_item_brief(self, item: ScoredItem, style: str) -> ItemNarrative:
+        words = item.title.split()
+        headline = " ".join(words[:12]) + ("…" if len(words) > 12 else "")
+        summary = _clean_extract(item.snippet, item.title, max_chars=150)
+        return ItemNarrative(
+            headline=headline,
+            what_happened=summary,
+            why_it_matters="",
+            kestrel_angle="",
         )
 
     def watchpoints(self, items: list[ScoredItem], style: str) -> list[str]:
