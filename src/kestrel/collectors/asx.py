@@ -1,62 +1,112 @@
 """ASX announcements collector.
 
-Uses the ASX JSON endpoint. Note: ASX migrated to a Vue.js SPA in 2024/2025
-and the public API now returns 404. Sources should be migrated to individual
-company IR pages in the source registry.
+Scrapes the ASX v2 announcements page per company ticker. Filters out routine
+administrative filings (director interest notices, capital quotations, substantial
+holder changes) and returns only substantive announcements within the collection
+window. Price-sensitive announcements always pass the filter.
 """
 from __future__ import annotations
 import logging
+import re
+import zoneinfo
 from datetime import datetime, timezone
 
 import httpx
-from dateutil.parser import parse as parse_date
 
 from kestrel.models import RawItem, Source, Window
 
 log = logging.getLogger(__name__)
 
-UA = "Kestrel/1.0 (Australian Defence Brief; contact product@quantrim.com)"
-HEADERS = {"User-Agent": UA, "Accept": "application/json, text/html"}
+_SYDNEY_TZ = zoneinfo.ZoneInfo("Australia/Sydney")
 
-# ASX's internal JSON endpoint — NOTE: this API was shut down by ASX when they
-# migrated to a Vue.js SPA in 2024/2025. Both this and the old HTML page return 404.
-# TODO: replace with individual company IR-page sources in the source registry.
-_ASX_JSON = "https://www.asx.com.au/asx/1/company/{ticker}/announcements?count=20&market_sensitive=false"
+_ANNOUNCEMENTS_URL = (
+    "https://www.asx.com.au/asx/v2/statistics/announcements.do"
+    "?by=asxCode&asxCode={ticker}&timeframe=D&period=M"
+)
+_VIEWER_URL = (
+    "https://www.asx.com.au/asx/v2/statistics/displayAnnouncement.do"
+    "?display=pdf&idsId={ids_id}"
+)
+
+_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+
+# Headline substrings that mark routine admin filings — excluded unless price-sensitive
+_ADMIN_PATTERNS = re.compile(
+    r"change of director.s interest|"
+    r"notification regarding unquoted|"
+    r"application for quotation of securities|"
+    r"becoming a substantial holder|"
+    r"ceasing to be a substantial holder|"
+    r"notification of cessation|"
+    r"change in substantial holding|"
+    r"appendix 3[by]|"
+    r"top [12]00 security holders",
+    re.IGNORECASE,
+)
 
 
-def _parse_json(data: dict, ticker: str, source_name: str, window: Window) -> list[RawItem]:
-    items = []
-    for ann in data.get("data", []):
-        title = ann.get("header", "").strip()
-        url = ann.get("url", "").strip()
-        if not url:
-            doc_date = ann.get("document_date", "")
-            url = f"https://www.asx.com.au/asxpdf/{doc_date[:8].replace('-','')}/{ticker.lower()}.htm"
-        price_sensitive = bool(ann.get("price_sensitive"))
+def _parse_sydney_date(raw: str) -> datetime | None:
+    """Parse ASX date string like '29/06/2026 5:22 pm' as Sydney time → UTC."""
+    raw = re.sub(r"\s+", " ", raw).strip()
+    for fmt in ("%d/%m/%Y %I:%M %p", "%d/%m/%Y %H:%M"):
         try:
-            pub = parse_date(ann.get("document_date", "")).astimezone(timezone.utc)
-        except Exception:
-            pub = None
-
-        if pub and pub < window.start:
+            naive = datetime.strptime(raw[:19], fmt)
+            return naive.replace(tzinfo=_SYDNEY_TZ).astimezone(timezone.utc)
+        except ValueError:
             continue
-        if not title:
+    return None
+
+
+def _scrape(ticker: str, timeout: int) -> list[dict]:
+    """Fetch and parse the announcements.do page, returning raw dicts."""
+    try:
+        r = httpx.get(
+            _ANNOUNCEMENTS_URL.format(ticker=ticker),
+            headers={"User-Agent": _UA},
+            timeout=timeout,
+            follow_redirects=True,
+        )
+        if r.status_code != 200:
+            log.warning("ASX announcements.do HTTP %d for %s", r.status_code, ticker)
+            return []
+    except Exception as exc:
+        log.warning("ASX announcements.do request failed for %s: %s", ticker, exc)
+        return []
+
+    html = r.text
+    rows = re.findall(r"<tr[^>]*>(.*?)</tr>", html, re.DOTALL)
+    results = []
+    for row in rows:
+        ids_m = re.search(r"idsId=(\w+)", row)
+        if not ids_m:
+            continue
+        ids_id = ids_m.group(1)
+
+        cells = re.findall(r"<td[^>]*>(.*?)</td>", row, re.DOTALL)
+        if len(cells) < 2:
             continue
 
-        snippet = f"[ASX:{ticker}] {ann.get('document_type', '')}".strip()
-        if price_sensitive:
-            snippet += " [PRICE SENSITIVE]"
+        is_sensitive = "icon-price-sensitive" in row
 
-        items.append(RawItem(
-            title=title,
-            url=f"https://www.asx.com.au{url}" if url.startswith("/") else url,
-            source_name=source_name,
-            published_at=pub,
-            snippet=snippet,
-            raw_meta={"asx_ticker": ticker, "price_sensitive": price_sensitive,
-                      "doc_type": ann.get("document_type", "")},
-        ))
-    return items
+        date_raw = re.sub(r"<[^>]+>", " ", cells[0])
+        date_str = re.sub(r"\s+", " ", date_raw).strip()
+
+        # Headline is the anchor text in the last meaningful cell
+        hl_m = re.search(r'text-decoration:\s*none[^>]*>([^<]+)', row)
+        if not hl_m:
+            hl_m = re.search(r'<a\s[^>]+>([^<]+)', row)
+        headline = re.sub(r"\s+", " ", hl_m.group(1)).strip() if hl_m else ""
+
+        if not headline or not ids_id:
+            continue
+
+        results.append({
+            "date_str": date_str,
+            "headline": headline,
+            "sensitive": is_sensitive,
+            "ids_id": ids_id,
+        })
+    return results
 
 
 class ASXCollector:
@@ -64,31 +114,51 @@ class ASXCollector:
         self._timeout = timeout
 
     def collect(self, source: Source, window: Window) -> list[RawItem]:
-        ticker = source.asx_ticker.strip().upper()
+        ticker = (source.asx_ticker or "").strip().upper()
         if not ticker:
             log.warning("ASX source %s has no ticker", source.name)
             return []
 
-        # Try JSON endpoint (NOTE: returns 404 since ASX migrated to Vue.js SPA)
-        try:
-            resp = httpx.get(
-                _ASX_JSON.format(ticker=ticker),
-                headers=HEADERS,
-                timeout=self._timeout,
-                follow_redirects=True,
-            )
-            if resp.status_code == 200:
-                data = resp.json()
-                items = _parse_json(data, ticker, source.name, window)
-                log.info("ASX JSON %s -> %d items", ticker, len(items))
-                return items
-            if resp.status_code == 404:
-                log.warning(
-                    "ASX API deprecated for %s (404) — update source registry to use company IR page",
-                    ticker,
-                )
-                return []
-        except Exception as exc:
-            log.warning("ASX JSON endpoint failed for %s: %s", ticker, exc)
+        raw = _scrape(ticker, self._timeout)
+        if not raw:
+            return []
 
-        return []
+        items: list[RawItem] = []
+        for ann in raw:
+            pub = _parse_sydney_date(ann["date_str"])
+
+            # Window filter
+            if pub and pub < window.start:
+                continue
+            if pub and pub > window.end:
+                continue
+
+            headline = ann["headline"]
+            is_sensitive = ann["sensitive"]
+
+            # Skip routine admin filings unless price-sensitive
+            if not is_sensitive and _ADMIN_PATTERNS.search(headline):
+                log.debug("ASX %s: skipping admin announcement: %s", ticker, headline[:60])
+                continue
+
+            url = _VIEWER_URL.format(ids_id=ann["ids_id"])
+            snippet = f"[ASX:{ticker}]"
+            if is_sensitive:
+                snippet += " [PRICE SENSITIVE]"
+
+            items.append(RawItem(
+                title=headline,
+                url=url,
+                source_name=source.name,
+                published_at=pub,
+                snippet=snippet,
+                raw_meta={
+                    "asx_ticker": ticker,
+                    "price_sensitive": is_sensitive,
+                    "ids_id": ann["ids_id"],
+                },
+            ))
+
+        log.info("ASX %s: %d substantive announcements in window (from %d total)",
+                 ticker, len(items), len(raw))
+        return items
