@@ -260,6 +260,18 @@
   {% endif %}
 
   <!-- ============================================================
+       SUBSCRIBE NUDGE — before AusTender
+  ============================================================ -->
+  <tr>
+    <td style="padding:14px 40px;border-top:1px solid {{ c.border }};text-align:center;background:{{ c.quote_bg }};">
+      <p style="margin:0;font-size:13px;color:{{ c.body }};">
+        Forwarded this email?&nbsp;
+        <a href="https://kestrelrun.com" style="color:{{ c.blue }};font-weight:600;text-decoration:none;">Subscribe here.</a>
+      </p>
+    </td>
+  </tr>
+
+  <!-- ============================================================
        AUSTENDER MOVEMENT — top contract events by value
   ============================================================ -->
   {% if brief.austender_contracts %}
@@ -285,6 +297,18 @@
   {% endif %}
 
   <!-- ============================================================
+       FORWARD NUDGE — before footer
+  ============================================================ -->
+  <tr>
+    <td style="padding:16px 40px;border-top:1px solid {{ c.border }};text-align:center;">
+      <p style="margin:0;font-size:13px;color:{{ c.body }};">
+        <a href="https://kestrelrun.com" style="color:{{ c.blue }};font-weight:600;text-decoration:none;">Forward this email</a>
+        to others who would appreciate this brief.
+      </p>
+    </td>
+  </tr>
+
+  <!-- ============================================================
        FOOTNOTE
   ============================================================ -->
   <tr>
@@ -293,8 +317,8 @@
         This email was created by AI. Errors &amp; Omissions Expected.
       </p>
       <p style="margin:0 0 6px 0;font-size:11px;color:{{ c.muted }};">
-        For feedback or sponsorship interest, please contact
-        <a href="mailto:product@quantrim.com" style="color:{{ c.blue }};">Quantrim</a>.
+        For feedback or sponsorship interest, visit
+        <a href="https://kestrelrun.com" style="color:{{ c.blue }};">Kestrel (kestrelrun.com)</a>.
       </p>
       <p style="margin:0 0 20px 0;font-size:11px;color:{{ c.muted }};">
         <a href="mailto:product@quantrim.com?subject=Kestrel%20Unsubscribe&amp;body=Please%20remove%20me%20from%20the%20Kestrel%20distribution%20list.%20Name%3A%20%5Byour%20name%5D"
